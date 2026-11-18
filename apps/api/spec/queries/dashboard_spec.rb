@@ -65,11 +65,12 @@ RSpec.describe "ダッシュボード（日ごと・医師ごとの集計）" do
     expect(rows).to eq([])
   end
 
-  it "医師・患者には、何も出ない" do
-    appointment = appointment_at(Time.zone.local(2030, 1, 7, 9))
+  # 医師と患者の入口には、ダッシュボードの操作そのものが載っていない（spec/graphql/schema_spec.rb）
+  it "ほかの医療機関の事務スタッフには、何も出ない" do
+    appointment_at(Time.zone.local(2030, 1, 7, 9))
 
-    expect(rows(user: doctor_a)).to eq([])
-    expect(rows(user: appointment.patient)).to eq([])
+    expect(rows(user: create(:clerk))).to eq([])
+    expect(rows.size).to eq(1)
   end
 
   it "期間は31日まで。32日・逆向きは、集計せずに断る" do

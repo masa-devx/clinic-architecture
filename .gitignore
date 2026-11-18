@@ -13,7 +13,7 @@ node_modules/
 dist/
 coverage/
 
-# Next.js・Playwright（apps/web）
+# Next.js・Playwright（apps/patient・clerk・doctor・e2e）
 .next/
 next-env.d.ts
 *.tsbuildinfo

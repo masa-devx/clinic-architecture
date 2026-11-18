@@ -52,12 +52,12 @@ jobs:
         run: bin/rubocop
       - name: DB を作る
         run: bin/rails db:prepare
-      # 書き出してある schema.graphql が今のスキーマと同じかは、RSpec（spec/graphql/schema_spec.rb）が確かめる
+      # 書き出してある3つのスキーマ（schema/*.graphql）が今のスキーマと同じかは、RSpec（spec/graphql/schema_spec.rb）が確かめる
       - name: RSpec
         run: bundle exec rspec
 
   web:
-    name: 画面（型の生成のずれ・ESLint・型・Vitest・ビルド）
+    name: 画面（3つのアプリ。型の生成のずれ・ESLint・型・Vitest・ビルド）
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -65,7 +65,7 @@ jobs:
       - name: 依存を入れる
         run: pnpm install --frozen-lockfile
       - name: スキーマから作った型が、コミットしてあるものと同じか
-        run: pnpm codegen && git diff --exit-code -- apps/web/lib/gql
+        run: pnpm codegen && git diff --exit-code -- apps/patient/lib/gql apps/clerk/lib/gql apps/doctor/lib/gql
       - name: 整形
         run: pnpm format:check
       - name: ESLint

@@ -65,6 +65,8 @@ agents/ の目次。作業内容に合うルールを読み、スキルで進め
 
 | 作業 | スキル |
 | --- | --- |
+| 次に何を・なぜ・どの順でやるかを決める。Issue と板。道具を入れる前の5つの問い | [pm](skills/pm/SKILL.md) |
+| 1つの Issue を、どう作るか・どこまでで終わりかを決める。質問で理解を確かめる。PR を見る | [tech-lead](skills/tech-lead/SKILL.md) |
 | 実装の前に、次の一歩の解説を作って止まる | [explain-step](skills/explain-step/SKILL.md) |
 | 実装のあとに、書いたコードを解説して、数字と一緒に記録する | [explain-change](skills/explain-change/SKILL.md) |
 | 差分をレビューする（PR 前の自己点検を含む）、完了を判断する | [review](skills/review/SKILL.md) |

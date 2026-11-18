@@ -100,7 +100,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     subgraph repo[1つのリポジトリ（pnpm workspace）]
-      W[apps/web<br>Next.js＋Chakra UI＋Apollo Client]
+      W[apps/patient・clerk・doctor<br>Next.js＋Chakra UI＋Apollo Client]
       U[packages/ui<br>テーマと共通の部品]
       A[apps/api<br>Rails＋graphql-ruby]
     end

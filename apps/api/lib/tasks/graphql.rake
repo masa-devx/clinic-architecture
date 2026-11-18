@@ -1,8 +1,10 @@
 namespace :graphql do
-  desc "GraphQL のスキーマを schema.graphql に書き出す（画面の型は、ここから作る）"
+  desc "3つの入口の GraphQL のスキーマを schema/ に書き出す（画面の型は、ここから作る）"
   task dump: :environment do
-    path = Rails.root.join("schema.graphql")
-    File.write(path, ClinicSchema.to_definition)
-    puts "書き出しました: #{path}"
+    GraphqlController::SCHEMAS.each do |audience, schema|
+      path = Rails.root.join("schema", "#{audience}.graphql")
+      File.write(path, schema.to_definition)
+      puts "書き出しました: #{path}"
+    end
   end
 end

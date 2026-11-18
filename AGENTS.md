@@ -33,7 +33,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | パス | 責務 |
 | --- | --- |
 | apps/api/ | Rails（API モード）。下の表のとおりに分ける |
-| apps/api/app/graphql/ | 入口。`types/`（型）・`resolvers/`（読む）・`mutations/`（変える）・`sources/`（Dataloader のまとめ読み）。業務のルールは書かない |
+| apps/api/app/graphql/ | 入口。利用者ごとに3つ（`patient_api/`・`clerk_api/`・`doctor_api/`。その人が使う query と mutation だけを載せる）。`types/`（型）・`resolvers/`（読む）・`mutations/`（変える）・`sources/`（Dataloader のまとめ読み）は、3つで共有する。業務のルールは書かない |
 | apps/api/app/services/<機能>/ | 業務の処理。1つの操作 = 1クラス（`Appointments::Book` など）。DB も時計も読まない決まり（`CancellationRule`・`Slots::Schedule`）も、ここに置く |
 | apps/api/app/queries/<機能>/ | 複雑な読み取り（一覧・空き枠）。SQL を1か所で見られるようにする |
 | apps/api/app/policies/ | 認可。要件の4章の表を、ここだけに書く |
@@ -41,16 +41,17 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | apps/api/app/jobs/・config/recurring.yml | 定期に動かすジョブ（通知を送る・リマインドを入れる・無断キャンセルにする）。中身は services を呼ぶだけ |
 | apps/api/app/mailers/・app/views/ | 患者へのメール |
 | apps/api/lib/ | どの機能にも属さない基盤（エラーのコード・結果の型・ログ・カーソルのページング） |
-| apps/api/schema.graphql | Rails が書き出したスキーマ。画面の型は、ここから作る |
-| apps/web/ | Next.js。`app/`（URL と画面・ログインの確認）→ `features/<機能>/`（部品・fragment・mutation・テスト）→ `lib/`（Apollo の設定・認証・日付・エラー・生成した型 `lib/gql/`）。向きは ESLint で止めている |
-| apps/web/e2e/ | Playwright の E2E。初期データ（`apps/api/db/seeds.rb`）に対して走らせる |
-| packages/ui/ | 見た目の部品とテーマ（Chakra UI）。業務の言葉を持たない |
+| apps/api/schema/ | Rails が書き出した、3つの入口のスキーマ（`patient.graphql`・`clerk.graphql`・`doctor.graphql`）。画面の型は、ここから作る |
+| apps/patient/・apps/clerk/・apps/doctor/ | 画面（Next.js）。患者用・事務スタッフ用・医師用の3つ。どれも `app/`（URL と画面・ログインの確認）→ `features/<機能>/`（部品・fragment・mutation・テスト）→ `lib/`（ログインしている人・生成した型 `lib/gql/`）。向きは ESLint で止めている（`eslint.app.mjs`） |
+| packages/ui/ | 見た目の部品とテーマ（Chakra UI）。画面の枠・状態の印・確認の窓つきボタンなど。業務の言葉を持たない |
+| packages/web-kit/ | 3つの画面で共有する土台。Apollo の設定・ログインのフォーム・画面の枠と Next.js のつなぎ・日付・状態の呼び方。`staff/` は、事務スタッフと医師で共通の部品（診療枠を作るフォーム・空き枠の一覧） |
+| e2e/ | Playwright の E2E。3つの画面をまたいで、初期データ（`apps/api/db/seeds.rb`）に対して走らせる |
 | docker/api/ | 手元の開発とテストで使う Rails のイメージ |
 | docs/ | 目的（product.md）・要件（requirements.md）・選定と段階（roadmap.md）・フロントの設計（frontend.md）・設計の記録（decisions.md）・課題と改善（improvements/）・段階ごとの解説（steps/） |
 | agents/ | 開発ルール（rules/）・手順（skills/） |
 | .claude/ | Claude Code 向けの権限・フック・レビュー役。rules・skills は agents/ へのリンク |
 | .agents/ | Codex 向け。skills は agents/skills へのリンク |
-| apps/web/AGENTS.md | Next.js が `pnpm dev` のときに自動で作る注意書き（Next.js 16 は、同梱の `node_modules/next/dist/docs/` を読むこと） |
+| apps/*/AGENTS.md | Next.js が `pnpm dev` のときに自動で作る注意書き（Next.js 16 は、同梱の `node_modules/next/dist/docs/` を読むこと） |
 
 ## 主要コマンド
 
@@ -60,10 +61,10 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | --- | --- | --- | --- |
 | 道具の版をそろえる | `mise install` | mise | nodenv・nvm・Volta・rbenv（mise に一本化したため） |
 | セットアップ | `pnpm install` → `docker compose up -d --wait`（初回は gem を入れ、DB を作り、初期データを入れる） | Docker | 手元の Ruby（Ruby は Docker の中だけで動かす） |
-| 起動 | `docker compose up -d --wait`（API は http://localhost:3001 ・DB は 55440 番・メールの受信箱は http://localhost:58026 ・ジョブの係も一緒に起動する）→ `pnpm dev`（画面は http://localhost:3000 ） | セットアップ | `bin/rails server` を手元で直接（同上） |
+| 起動 | `docker compose up -d --wait`（API は http://localhost:3001 ・DB は 55440 番・メールの受信箱は http://localhost:58026 ・ジョブの係も一緒に起動する）→ `pnpm dev`（3つの画面を一緒に起動する。患者用は http://localhost:3000 ・事務スタッフ用は http://localhost:3010 ・医師用は http://localhost:3020 ） | セットアップ | `bin/rails server` を手元で直接（同上） |
 | 止める | `docker compose stop`（`down -v` は DB の中身も消す） | — | — |
 | テスト（バックエンド） | `docker compose run --rm api bundle exec rspec` | DB が起動している | — |
-| テスト（フロントエンド） | `pnpm test`（Vitest）／`pnpm e2e`（Playwright。API と DB を起動し、初期データを入れ直してから走る。初回は `pnpm --filter web exec playwright install chromium`） | Docker | — |
+| テスト（フロントエンド） | `pnpm test`（Vitest）／`pnpm e2e`（Playwright。API と DB を起動し、初期データを入れ直してから走る。初回は `pnpm --filter e2e exec playwright install chromium`） | Docker | — |
 | 静的検査 | `docker compose run --rm api bin/rubocop`／`pnpm lint`・`pnpm typecheck`・`pnpm format:check` | — | `next lint`（Next.js 16 でなくなった） |
 | スキーマから型を作る | `docker compose run --rm api bin/rails graphql:dump` → `pnpm codegen` | スキーマ（型・resolver・mutation）を変えたとき | 型を手で書く |
 | マイグレーション | `docker compose run --rm api bin/rails db:migrate` | — | — |
@@ -71,7 +72,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | ビルド | `pnpm build` | — | — |
 | 大量のデータを入れる（段階2） | 【記入】 | 【記入】 | 【記入】 |
 
-初期データのログイン（手元だけの捨ててよい値。正は `apps/api/db/seeds.rb`）: 患者は `patient1@example.com`（http://localhost:3000/login ）、スタッフは `clerk1@sakura.example`（事務スタッフ。管理者なので、監査ログも見られる）・`doctor1@sakura.example`（医師）（http://localhost:3000/staff/login ）。
+初期データのログイン（手元だけの捨ててよい値。パスワードは全員 `password-for-local-only`。正は `apps/api/db/seeds.rb`）: 患者は `patient1@example.com`（http://localhost:3000 ）、事務スタッフは `clerk1@sakura.example`（管理者なので、監査ログも見られる。http://localhost:3010 ）、医師は `doctor1@sakura.example`（http://localhost:3020 ）。3つの画面は、ログインが別々。
 
 未記入のコマンドは推測して実行しない。必要な操作について確認する。
 
@@ -93,6 +94,8 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 ルールの【記入】（対象のパス・使う道具）は、まだ埋めていない（[harness-setup](agents/skills/harness-setup/SKILL.md) で埋める）。矛盾する指示や未確定の仕様は、該当箇所を示して確認する。
 
 ### 作業の流れ
+
+実践の課題（[docs/practice.md](docs/practice.md)）は、役を分けて進める。**何を・なぜ・どの順で**は [pm](agents/skills/pm/SKILL.md)、**どう作るか・どこまでで終わりか**は [tech-lead](agents/skills/tech-lead/SKILL.md)。どちらも、相手が考える前に答えを出さない。
 
 1. 段階1までは、解説で止まらずに実装する（[docs/decisions.md](docs/decisions.md) の D-002）。段階2より先の進め方は、段階1が終わってから決める
 2. 確かめたいことは、テストで書く。守りを外すとテストが落ちることを確かめる（例: UNIQUE を外すと、同時に20件の予約が20件とも成功する）

@@ -1,7 +1,10 @@
 module GraphqlHelper
-  # スキーマを通して実行する（HTTP は通さない）。想定していないエラーが出たら、その場で落とす
-  def execute_graphql(query, variables: {}, user: nil, now: Time.current, expect_errors: false)
-    result = ClinicSchema.execute(query, variables: variables.deep_stringify_keys, context: { current_user: user, now: now }).to_h
+  # スキーマを通して実行する（HTTP は通さない）。想定していないエラーが出たら、その場で落とす。
+  # 入口（スキーマ）は、user の種類で決まる。ログインしていない場合などは、audience で指定する
+  def execute_graphql(query, variables: {}, user: nil, audience: nil, now: Time.current, expect_errors: false)
+    audience ||= Audience.of(user) || "patient"
+    schema = GraphqlController::SCHEMAS.fetch(audience)
+    result = schema.execute(query, variables: variables.deep_stringify_keys, context: { current_user: user, audience: audience, now: now }).to_h
     raise "GraphQL のエラー: #{result['errors'].inspect}" if result["errors"] && !expect_errors
 
     result

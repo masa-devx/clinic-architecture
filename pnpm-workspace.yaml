@@ -1,7 +1,10 @@
 # apps/api は Rails なので、ここには入れない
 packages:
-  - apps/web
+  - apps/patient
+  - apps/clerk
+  - apps/doctor
   - packages/*
+  - e2e
 minimumReleaseAgeExclude:
   - '@hookform/resolvers@7.0.7'
   - '@typescript-eslint/eslint-plugin@8.73.0'

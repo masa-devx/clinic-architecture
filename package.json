@@ -3,15 +3,15 @@
   "private": true,
   "packageManager": "pnpm@12.21.0",
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter web build",
-    "codegen": "pnpm --filter web codegen",
+    "dev": "pnpm --parallel --filter patient --filter clerk --filter doctor dev",
+    "build": "pnpm --filter patient --filter clerk --filter doctor build",
+    "codegen": "pnpm --filter patient --filter clerk --filter doctor codegen",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm --filter web test",
-    "e2e": "docker compose up -d --wait && docker compose run --rm api bin/rails db:seed && pnpm --filter web e2e",
-    "format": "prettier --write \"{apps/web,packages}/**/*.{ts,tsx,mjs,json}\" --ignore-path .prettierignore",
-    "format:check": "prettier --check \"{apps/web,packages}/**/*.{ts,tsx,mjs,json}\" --ignore-path .prettierignore"
+    "test": "pnpm -r --filter '!e2e' test",
+    "e2e": "docker compose up -d --wait && docker compose run --rm api bin/rails db:seed && pnpm --filter e2e test",
+    "format": "prettier --write \"{apps/patient,apps/clerk,apps/doctor,packages,e2e}/**/*.{ts,tsx,mjs,json}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"{apps/patient,apps/clerk,apps/doctor,packages,e2e}/**/*.{ts,tsx,mjs,json}\" --ignore-path .prettierignore"
   },
   "devDependencies": {
     "prettier": "^3.10.1"
