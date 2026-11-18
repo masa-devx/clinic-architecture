@@ -69,6 +69,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | スキーマから型を作る | `docker compose run --rm api bin/rails graphql:dump` → `pnpm codegen` | スキーマ（型・resolver・mutation）を変えたとき | 型を手で書く |
 | マイグレーション | `docker compose run --rm api bin/rails db:migrate` | — | — |
 | 初期データを入れ直す | `docker compose run --rm api bin/rails db:seed`（何度流しても同じ結果） | — | — |
+| 計測用の大量のデータ（課題 E-1） | `docker compose exec api bin/rails bulk:load`（予約100万件・1分半ほど。`APPOINTMENTS=10000` で小さく）／`bin/rails bulk:clear` で消す。初期データとは別の「計測用クリニック」に入る | — | — |
 | ビルド | `pnpm build` | — | — |
 | 大量のデータを入れる（段階2） | 【記入】 | 【記入】 | 【記入】 |
 
