@@ -1,5 +1,4 @@
-# push と PR のたびに、バックエンドとフロントエンドの確認を流す
-# E2E（Playwright）は、API・DB・画面を全部立てる必要があるので、まだ CI には入れていない（手元で pnpm e2e）
+# push と PR のたびに、バックエンド・フロントエンド・E2E の確認を流す。3つとも通らないと、main にマージできない（ブランチの保護）
 name: CI
 
 on:
@@ -76,3 +75,82 @@ jobs:
         run: pnpm test
       - name: ビルド
         run: pnpm build
+
+  # 3つの画面をまたぐ、止まると困る流れ（予約 → 受付 → 診察 → 会計・医療機関ごとの分離）。
+  # 手元の pnpm e2e は Docker の API を使うが、CI では Rails をそのまま起動する（イメージを作り、gem を入れ直す時間を省く）
+  e2e:
+    name: E2E（3つの画面をまたぐ流れ）
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:18.7-alpine
+        env:
+          POSTGRES_USER: postgres
+          # CI の中だけの捨ててよい値
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      # 初期データは開発の環境でだけ入るので、手元と同じ development で動かす
+      RAILS_ENV: development
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      # 問診の暗号の鍵。CI の中だけの捨ててよい値
+      AR_ENCRYPTION_PRIMARY_KEY: ci-only-primary-key-0000000000000000
+      AR_ENCRYPTION_DETERMINISTIC_KEY: ci-only-deterministic-key-00000000
+      AR_ENCRYPTION_KEY_DERIVATION_SALT: ci-only-key-derivation-salt-000000
+      WEB_ORIGINS: http://localhost:3000,http://localhost:3010,http://localhost:3020
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: apps/api
+          bundler-cache: true
+      - uses: jdx/mise-action@v3
+      - name: 依存を入れる
+        run: pnpm install --frozen-lockfile
+      # 新しい DB を作ると、初期データ（db/seeds.rb）も入る
+      - name: DB を作り、初期データを入れる
+        working-directory: apps/api
+        run: bin/rails db:prepare
+      # 画面の Next.js は、API を http://localhost:3001 に探す（手元の Docker と同じ番号）
+      - name: API を起動する
+        working-directory: apps/api
+        run: |
+          bin/rails server -p 3001 -d
+          for i in $(seq 1 60); do curl -fsS http://localhost:3001/up >/dev/null && exit 0; sleep 1; done
+          echo "API が起動しませんでした"; tail -n 100 log/development.log; exit 1
+      - name: Playwright の版を調べる
+        id: playwright
+        run: echo "version=$(pnpm --filter e2e exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - name: Playwright のブラウザをキャッシュから戻す
+        id: browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - name: Playwright のブラウザを入れる
+        if: steps.browsers.outputs.cache-hit != 'true'
+        run: pnpm --filter e2e exec playwright install --with-deps chromium
+      - name: ブラウザが使う OS の部品を入れる
+        if: steps.browsers.outputs.cache-hit == 'true'
+        run: pnpm --filter e2e exec playwright install-deps chromium
+      # 3つの画面は、Playwright が起動する（e2e/playwright.config.ts の webServer）
+      - name: E2E
+        run: pnpm --filter e2e test
+      - name: 落ちたときの記録を残す
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            e2e/test-results
+            apps/api/log/development.log
+          retention-days: 7
