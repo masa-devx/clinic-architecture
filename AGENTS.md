@@ -94,6 +94,8 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 
 ### 作業の流れ
 
+実践の課題（[docs/practice.md](docs/practice.md)）は、役を分けて進める。**何を・なぜ・どの順で**は [pm](agents/skills/pm/SKILL.md)、**どう作るか・どこまでで終わりか**は [tech-lead](agents/skills/tech-lead/SKILL.md)。どちらも、相手が考える前に答えを出さない。
+
 1. 段階1までは、解説で止まらずに実装する（[docs/decisions.md](docs/decisions.md) の D-002）。段階2より先の進め方は、段階1が終わってから決める
 2. 確かめたいことは、テストで書く。守りを外すとテストが落ちることを確かめる（例: UNIQUE を外すと、同時に20件の予約が20件とも成功する）
 3. 実装が終わったら、[explain-change](agents/skills/explain-change/SKILL.md) で解説し、[docs/decisions.md](docs/decisions.md) と [docs/improvements/](docs/improvements/README.md) に記録する
