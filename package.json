@@ -1,0 +1,19 @@
+{
+  "name": "clinic-architecture",
+  "private": true,
+  "packageManager": "pnpm@12.21.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "codegen": "pnpm --filter web codegen",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter web test",
+    "e2e": "docker compose up -d --wait && docker compose run --rm api bin/rails db:seed && pnpm --filter web e2e",
+    "format": "prettier --write \"{apps/web,packages}/**/*.{ts,tsx,mjs,json}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"{apps/web,packages}/**/*.{ts,tsx,mjs,json}\" --ignore-path .prettierignore"
+  },
+  "devDependencies": {
+    "prettier": "^3.10.1"
+  }
+}

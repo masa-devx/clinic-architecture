@@ -1,0 +1,31 @@
+# 秘密の値（値の入っていない見本の .env.example だけをコミットする）
+.env
+.env.*
+!.env.example
+.dev.vars
+secrets/
+
+# Claude Code の手元だけの設定（許可した操作の記録など）
+.claude/settings.local.json
+
+# 言語・フレームワークの生成物
+node_modules/
+dist/
+coverage/
+
+# Next.js・Playwright（apps/web）
+.next/
+next-env.d.ts
+*.tsbuildinfo
+playwright-report/
+test-results/
+
+# Rails（apps/api）
+apps/api/log/*
+apps/api/tmp/*
+apps/api/storage/
+apps/api/config/master.key
+apps/api/config/credentials/*.key
+
+# OS
+.DS_Store

@@ -1,0 +1,26 @@
+# 接続先は環境変数で渡す（compose.yaml）。既定の値は、手元の Docker の DB（捨ててよい値）
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch("DB_HOST", "127.0.0.1") %>
+  port: <%= ENV.fetch("DB_PORT", "55440") %>
+  username: <%= ENV.fetch("DB_USER", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "postgres") %>
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: clinic_architecture_development
+
+test:
+  <<: *default
+  database: clinic_architecture_test
+  # 同時に20リクエストを送るテストで、スレッドごとに接続を1本使う
+  max_connections: 25
+
+# 本番の置き場は段階7で決める。接続先は DATABASE_URL だけで渡す
+production:
+  adapter: postgresql
+  encoding: unicode
+  url: <%= ENV["DATABASE_URL"] %>
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>

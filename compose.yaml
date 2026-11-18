@@ -1,0 +1,83 @@
+# 手元の開発で使う DB・API・ジョブの係・メールの受信箱。本番では使わない
+# 起動: docker compose up -d ／ 止める: docker compose stop（down -v は DB の中身も消す）
+# 画面（apps/web）は、手元の Node で動かす（pnpm dev）
+name: clinic-architecture
+
+# API とジョブの係（どちらも Rails）で同じにする環境変数。どれも、手元とテストだけの捨ててよい値
+x-rails-env: &rails-env
+  DB_HOST: db
+  DB_PORT: "5432"
+  DB_USER: postgres
+  DB_PASSWORD: postgres
+  SMTP_HOST: mailpit
+  SMTP_PORT: "1025"
+  # 問診の答えを DB の中で暗号にする鍵（Active Record Encryption）。手元とテスト専用。
+  # 本番では、別の鍵を、秘密の値として環境変数で渡す（ここの値を使わない）
+  AR_ENCRYPTION_PRIMARY_KEY: local-only-DB0bmWqlbeC2CJKGEV2SUwTTD1H13u3J
+  AR_ENCRYPTION_DETERMINISTIC_KEY: local-only-J-lpMfaZRvcZTO6lxbKoUaRtZG9aEVxI
+  AR_ENCRYPTION_KEY_DERIVATION_SALT: local-only-LfxMgsoqPK2tBrDaRYvBRivOPF1xDXCJ
+
+services:
+  db:
+    image: postgres:18.7-alpine
+    # 手元だけの捨ててよい値。本番の値はここに書かない
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "127.0.0.1:55440:5432"
+    volumes:
+      # PostgreSQL 18 のイメージは、/var/lib/postgresql の下に版ごとのフォルダを作る
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build: ./docker/api
+    working_dir: /app/apps/api
+    volumes:
+      - .:/app
+      - bundle:/bundle
+    ports:
+      - "127.0.0.1:3001:3000"
+    environment:
+      <<: *rails-env
+      # 画面のオリジン。GraphQL の入口で、これ以外の Origin からの要求を断る
+      WEB_ORIGIN: http://localhost:3000
+    command: sh -c "(bundle check || bundle install) && rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "ruby -rnet/http -e 'exit(Net::HTTP.get_response(URI(\"http://localhost:3000/up\")).code == \"200\" ? 0 : 1)'"]
+      interval: 3s
+      timeout: 5s
+      retries: 60
+
+  # ジョブを動かす係（Solid Queue）。定期の処理（通知を送る・リマインドを入れる・無断キャンセルにする）も、ここが動かす
+  worker:
+    build: ./docker/api
+    working_dir: /app/apps/api
+    volumes:
+      - .:/app
+      - bundle:/bundle
+    environment:
+      <<: *rails-env
+    command: bin/jobs
+    depends_on:
+      # API が、gem を入れて、マイグレーションを流し終えてから始める
+      api:
+        condition: service_healthy
+
+  # メールの受信箱の代わり。メールは外へ送られず、ここにたまる。中身は http://localhost:58026 で見られる
+  mailpit:
+    image: axllent/mailpit:v1.33.1
+    ports:
+      - "127.0.0.1:58026:8025"
+
+volumes:
+  db-data:
+  bundle:

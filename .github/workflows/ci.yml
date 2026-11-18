@@ -1,0 +1,78 @@
+# push と PR のたびに、バックエンドとフロントエンドの確認を流す
+# E2E（Playwright）は、API・DB・画面を全部立てる必要があるので、まだ CI には入れていない（手元で pnpm e2e）
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API（RuboCop・RSpec・スキーマのずれ）
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    services:
+      db:
+        image: postgres:18.7-alpine
+        env:
+          POSTGRES_USER: postgres
+          # CI の中だけの捨ててよい値
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      RAILS_ENV: test
+      DB_HOST: 127.0.0.1
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      # 問診の暗号の鍵。CI の中だけの捨ててよい値
+      AR_ENCRYPTION_PRIMARY_KEY: ci-only-primary-key-0000000000000000
+      AR_ENCRYPTION_DETERMINISTIC_KEY: ci-only-deterministic-key-00000000
+      AR_ENCRYPTION_KEY_DERIVATION_SALT: ci-only-key-derivation-salt-000000
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: apps/api
+          bundler-cache: true
+      - name: RuboCop
+        run: bin/rubocop
+      - name: DB を作る
+        run: bin/rails db:prepare
+      # 書き出してある schema.graphql が今のスキーマと同じかは、RSpec（spec/graphql/schema_spec.rb）が確かめる
+      - name: RSpec
+        run: bundle exec rspec
+
+  web:
+    name: 画面（型の生成のずれ・ESLint・型・Vitest・ビルド）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: jdx/mise-action@v3
+      - name: 依存を入れる
+        run: pnpm install --frozen-lockfile
+      - name: スキーマから作った型が、コミットしてあるものと同じか
+        run: pnpm codegen && git diff --exit-code -- apps/web/lib/gql
+      - name: 整形
+        run: pnpm format:check
+      - name: ESLint
+        run: pnpm lint
+      - name: 型チェック
+        run: pnpm typecheck
+      - name: Vitest
+        run: pnpm test
+      - name: ビルド
+        run: pnpm build

@@ -1,0 +1,18 @@
+import { graphql } from "@/lib/gql";
+
+export const DashboardDocument = graphql(`
+  query Dashboard($from: ISO8601Date!, $to: ISO8601Date!) {
+    dashboard(from: $from, to: $to) {
+      date
+      total
+      canceled
+      noShow
+      completed
+      revenue
+      doctor {
+        id
+        name
+      }
+    }
+  }
+`);

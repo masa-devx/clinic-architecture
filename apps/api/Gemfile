@@ -1,0 +1,26 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.1.4", ">= 8.1.4.1"
+gem "pg", "~> 1.7"
+gem "puma", "~> 8.1"
+
+# パスワードのハッシュ（has_secure_password）
+gem "bcrypt", "~> 3.1"
+
+# GraphQL のスキーマと実行
+gem "graphql", "~> 2.6"
+
+# ジョブ。DB にジョブを置く（Redis が要らない）
+gem "solid_queue", "~> 1.7"
+
+# 起動を速くするキャッシュ（config/boot.rb で読む）
+gem "bootsnap", require: false
+
+group :development, :test do
+  gem "debug", platforms: %i[ mri ], require: "debug/prelude"
+  gem "rubocop-rails-omakase", require: false
+  gem "rspec-rails", "~> 8.1"
+  gem "factory_bot_rails", "~> 6.5"
+  # N+1 を見つける。テストでは、見つけたら例外にする
+  gem "bullet", "~> 8.3"
+end

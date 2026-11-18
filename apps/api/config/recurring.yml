@@ -1,0 +1,23 @@
+# 定期に動かす処理。bin/jobs（compose の worker）が、ここを読んで動かす
+default: &default
+  # outbox の通知を送る。予約してから、メールが出るまでの待ちは、長くてもこの間隔
+  dispatch_outbox:
+    class: DispatchOutboxJob
+    schedule: every 10 seconds
+  # 明日の予約のリマインドを入れる。何度動いても、同じ予約には1件だけ入る
+  enqueue_reminders:
+    class: EnqueueRemindersJob
+    schedule: every day at 6pm Asia/Tokyo
+  mark_no_shows:
+    class: MarkNoShowsJob
+    schedule: every minute
+  # 終わったジョブの記録を消す
+  clear_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+development:
+  <<: *default
+
+production:
+  <<: *default
