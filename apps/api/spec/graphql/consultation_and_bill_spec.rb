@@ -55,26 +55,28 @@ RSpec.describe "受付〜会計（GraphQL を通す）" do
       .to eq("bill" => { "status" => "PAID" }, "errors" => [])
   end
 
-  it "bill(id:) は、見られない人には null（ほかの患者・医師・ほかの医療機関の事務スタッフ・下書きのあいだの本人）" do
+  it "bill(id:) は、見られない人には null（ほかの患者・ほかの医療機関の事務スタッフ・下書きのあいだの本人）" do
     bill = create(:bill, appointment: appointment, clinic: appointment.clinic)
     query = "query($id: ID!) { bill(id: $id) { id } }"
     fetch = ->(user) { run(query, user: user, at: starts_at, id: bill.id.to_s)["bill"] }
 
     expect(fetch.call(clerk)).to eq("id" => bill.id.to_s)
-    [ patient, create(:patient), doctor, create(:clerk) ].each { |user| expect(fetch.call(user)).to be_nil }
+    [ patient, create(:patient), create(:clerk) ].each { |user| expect(fetch.call(user)).to be_nil }
+    # 医師の入口には bill の操作がない。予約からたどっても、医師には null
+    expect(node(user: doctor, at: starts_at)["bill"]).to be_nil
 
     bill.update!(status: :billed, total_amount: 0, billed_at: starts_at)
     expect(fetch.call(patient)).to eq("id" => bill.id.to_s)
     expect(fetch.call(create(:patient))).to be_nil
   end
 
-  it "料金の表は、自院の事務スタッフにだけ出る" do
+  # 医師と患者の入口には、料金の表の操作そのものが載っていない（spec/graphql/schema_spec.rb）
+  it "料金の表は、自院の分だけが出る" do
     create(:fee_item)
     query = "{ feeItems { name unitPrice } }"
 
     expect(run(query, user: clerk, at: starts_at)["feeItems"]).to eq([ { "name" => "再診料", "unitPrice" => 730 } ])
-    expect(run(query, user: doctor, at: starts_at)["feeItems"]).to eq([])
-    expect(run(query, user: patient, at: starts_at)["feeItems"]).to eq([])
+    expect(run(query, user: create(:clerk), at: starts_at)["feeItems"]).to eq([])
   end
 
   it "一覧に会計と明細を足しても、行が増えて SQL の本数は変わらない" do

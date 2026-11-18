@@ -122,7 +122,8 @@ RSpec.describe "監査ログ" do
 
     it "会計の明細を読むと残る。状態と合計だけ・見られない人が開いたときは、残らない" do
       query = "query($id: ID!) { bill(id: $id) { id items { name } } }"
-      execute_graphql(query, variables: { id: appointment.bill.id.to_s }, user: doctor, now: now)
+      # 医師の入口には、会計の操作そのものが載っていない（spec/graphql/schema_spec.rb）
+      execute_graphql(query, variables: { id: appointment.bill.id.to_s }, user: create(:patient), now: now)
       execute_graphql(query, variables: { id: appointment.bill.id.to_s }, user: create(:clerk), now: now)
       execute_graphql("query($id: ID!) { bill(id: $id) { id status totalAmount } }", variables: { id: appointment.bill.id.to_s }, user: patient, now: now)
       expect(actions).to eq([])
@@ -180,12 +181,18 @@ RSpec.describe "監査ログ" do
       expect(logs.last).to include("action" => "APPOINTMENT_BOOK", "actorKind" => "PATIENT", "actorName" => patient.name)
     end
 
-    it "管理者でない事務スタッフ・医師・患者・ほかの医療機関の管理者には、何も出ない" do
+    # 医師と患者の入口には、監査ログの操作そのものが載っていない（spec/graphql/schema_spec.rb）
+    it "管理者でない事務スタッフ・ほかの医療機関の管理者には、何も出ない" do
       run_whole_flow
 
-      [ clerk, doctor, patient, create(:clerk, admin: true), create(:doctor, clinic: clinic, admin: true) ].each do |user|
+      [ clerk, create(:clerk, admin: true) ].each do |user|
         expect(fetch(user)["edges"]).to eq([])
       end
+    end
+
+    it "管理者の印が付いていても、医師には、見られる範囲がない" do
+      expect(AuditLogPolicy.scope(create(:doctor, clinic: clinic, admin: true))).to be_empty
+      expect(AuditLogPolicy.scope(patient)).to be_empty
     end
 
     it "続きを読んでも、全部が1回ずつ、新しい順に出る。行が増えても SQL の本数は変わらない" do

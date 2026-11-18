@@ -79,12 +79,5 @@ RSpec.describe "診療枠（availableSlots・createSlots）" do
 
       expect(result.dig("data", "createSlots")).to include("createdCount" => nil, "errors" => [ include("code" => "INVALID_INPUT", "field" => "endTime") ])
     end
-
-    it "患者には作れない" do
-      result = execute_graphql(mutation, variables: { input: input }, user: patient, now: now)
-
-      expect(result.dig("data", "createSlots", "errors").map { |error| error["code"] }).to eq([ "NOT_PERMITTED" ])
-      expect(Slot.count).to eq(0)
-    end
   end
 end

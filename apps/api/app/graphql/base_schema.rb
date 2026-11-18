@@ -1,9 +1,13 @@
-class ClinicSchema < GraphQL::Schema
-  query Types::QueryType
-  mutation Types::MutationType
-
-  # 同じ種類の読み込みをためて、1回の SQL にまとめる（N+1 を出さない）
-  use GraphQL::Dataloader
+# 3つの入口（患者・事務スタッフ・医師）のスキーマに共通の設定。
+# 入口ごとのスキーマ（PatientApi::Schema など）は、これを継いで、その人が使う query と mutation だけを載せる。
+# 型（Types::）・業務の処理（app/services）・認可（app/policies）は、入口をまたいで共有する
+class BaseSchema < GraphQL::Schema
+  # 同じ種類の読み込みをためて、1回の SQL にまとめる（N+1 を出さない）。
+  # `use GraphQL::Dataloader` は、継いだスキーマには引き継がれない（入れ忘れると、まとめ読みが全部エラーになる）ので、継ぐたびに入れる
+  def self.inherited(schema)
+    super
+    schema.use GraphQL::Dataloader
+  end
 
   # 重いクエリを止める。イントロスペクション（スキーマの取得）は深いので、深さの数に入れない
   max_depth 10, count_introspection_fields: false

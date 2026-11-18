@@ -45,8 +45,8 @@ services:
       - "127.0.0.1:3001:3000"
     environment:
       <<: *rails-env
-      # 画面のオリジン。GraphQL の入口で、これ以外の Origin からの要求を断る
-      WEB_ORIGIN: http://localhost:3000
+      # 画面のオリジン（患者用・事務スタッフ用・医師用）。GraphQL の入口で、これ以外の Origin からの要求を断る
+      WEB_ORIGINS: http://localhost:3000,http://localhost:3010,http://localhost:3020
     command: sh -c "(bundle check || bundle install) && rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0 -p 3000"
     depends_on:
       db:
