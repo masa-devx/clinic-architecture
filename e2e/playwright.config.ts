@@ -24,11 +24,16 @@ export default defineConfig({
     timezoneId: "Asia/Tokyo",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // 手元は開発用のサーバー（すでに pnpm dev で動いていれば、それを使う）。
+  // CI は、先に組み立ててから本番の形で起動する。開発用だと、ページを初めて開いたときに組み立てが走り、
+  // その待ち時間で、たまに5秒の待ちを超えて落ちたため（2026-11-19）
   webServer: apps.map((app) => ({
-    command: `pnpm --filter ${app.name} dev`,
+    command: process.env.CI
+      ? `pnpm --filter ${app.name} build && pnpm --filter ${app.name} start`
+      : `pnpm --filter ${app.name} dev`,
     cwd: "..",
     url: `http://localhost:${app.port}/login`,
-    reuseExistingServer: true,
-    timeout: 120_000,
+    reuseExistingServer: !process.env.CI,
+    timeout: 180_000,
   })),
 });
