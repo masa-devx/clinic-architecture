@@ -4,7 +4,7 @@ class AuditLog < ApplicationRecord
   belongs_to :patient
 
   # 残す操作の一覧（ここだけで決める）。GraphQL の enum（AuditAction）は、ここから作る。
-  # 画面は、enum の値ごとに呼び方を持つ（apps/web/features/audit/labels.ts。操作を足すと、そちらで型のエラーになる）
+  # 画面は、enum の値ごとに呼び方を持つ（apps/clerk/features/audit/labels.ts。操作を足すと、そちらで型のエラーになる）
   ACTIONS = {
     "appointment.book" => "予約した",
     "appointment.cancel" => "予約をキャンセルした",

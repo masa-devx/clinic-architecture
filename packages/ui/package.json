@@ -7,7 +7,12 @@
     "./provider": "./src/provider.tsx",
     "./page-header": "./src/page-header.tsx",
     "./state-message": "./src/state-message.tsx",
-    "./toaster": "./src/toaster.tsx"
+    "./toaster": "./src/toaster.tsx",
+    "./status-badge": "./src/status-badge.tsx",
+    "./surface": "./src/surface.tsx",
+    "./stat-card": "./src/stat-card.tsx",
+    "./confirm-button": "./src/confirm-button.tsx",
+    "./shell": "./src/shell.tsx"
   },
   "scripts": {
     "lint": "eslint .",

@@ -1,6 +1,6 @@
 # 手元の開発で使う DB・API・ジョブの係・メールの受信箱。本番では使わない
 # 起動: docker compose up -d ／ 止める: docker compose stop（down -v は DB の中身も消す）
-# 画面（apps/web）は、手元の Node で動かす（pnpm dev）
+# 画面（apps/patient・clerk・doctor）は、手元の Node で動かす（pnpm dev）
 name: clinic-architecture
 
 # API とジョブの係（どちらも Rails）で同じにする環境変数。どれも、手元とテストだけの捨ててよい値
