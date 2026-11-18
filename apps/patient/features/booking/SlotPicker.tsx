@@ -33,12 +33,15 @@ export function SlotPicker({ clinicId }: { clinicId: string }) {
   const [bookAppointment] = useMutation(BookAppointmentDocument);
   const [rescheduleAppointment] = useMutation(RescheduleAppointmentDocument);
   const [actionError, setActionError] = useState<string | null>(null);
+  // 予約（時刻の変更）を送っているあいだは true。どの時刻のボタンも押せなくする
+  const [sending, setSending] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
   // 結果を待ってから画面を変える（先に「できた」と見せない）。
   // 同じ枠にほかの人が先に入ることがあり、そのとき「できた」を取り消して見せるより、少し待つほうが害が小さい
   const onSelect = async (slotId: string) => {
     setActionError(null);
+    setSending(true);
     try {
       // 予約が増える（変わる）と、空き枠も変わる。どちらの一覧のキャッシュも捨てて、次に開いたときに取り直させる
       const drop = (_: unknown, { DELETE }: { DELETE: unknown }) => DELETE;
@@ -70,6 +73,8 @@ export function SlotPicker({ clinicId }: { clinicId: string }) {
       router.push("/appointments");
     } catch {
       // 通信の失敗などは、Apollo の設定の1か所で知らせている
+    } finally {
+      setSending(false);
     }
   };
 
@@ -146,6 +151,7 @@ export function SlotPicker({ clinicId }: { clinicId: string }) {
           clinicName={data.clinic.name}
           mode={rescheduleId ? "reschedule" : "book"}
           onSelect={onSelect}
+          busy={sending}
         />
       )}
       {data.availableSlots.pageInfo.hasNextPage ? (

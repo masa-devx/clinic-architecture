@@ -43,7 +43,10 @@ export function SlotsPage() {
   const [patientEmail, setPatientEmail] = useState("");
 
   const onSelect = async (slotId: string) => {
-    if (!rescheduleId && !patientEmail.trim()) return setActionError("患者のメールアドレスを入れてください");
+    if (!rescheduleId && !patientEmail.trim()) {
+      setActionError("患者のメールアドレスを入れてください");
+      return;
+    }
     setBusyId(slotId);
     setActionError(null);
     try {
@@ -173,7 +176,13 @@ export function SlotsPage() {
         <SlotRows
           slots={slots}
           onClose={onClose}
-          select={{ label: rescheduleId ? "この時刻に変える" : "代わりに予約する", onSelect }}
+          select={{
+            label: rescheduleId ? "この時刻に変える" : "代わりに予約する",
+            confirmTitle: rescheduleId
+              ? "この時刻に変えますか？"
+              : `${patientEmail.trim() || "（メールアドレスが空です）"} さまの代わりに、予約を入れますか？`,
+            onSelect,
+          }}
           busyId={busyId}
         />
       )}

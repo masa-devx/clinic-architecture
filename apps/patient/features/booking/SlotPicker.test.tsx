@@ -101,6 +101,36 @@ describe("空いている枠から予約する", () => {
     expect(failures).toEqual([]);
   });
 
+  it("予約を送っているあいだは、確認の窓を閉じられず、どの時刻のボタンも押せない（2回送らない）", async () => {
+    let requests = 0;
+    let release = () => {};
+    const waiting = new Promise<void>((resolve) => (release = resolve));
+    server.use(
+      api.query("AvailableSlots", () => availableSlots([nine, ten])),
+      api.mutation("BookAppointment", async () => {
+        requests += 1;
+        await waiting;
+        return booked();
+      }),
+    );
+    renderWithProviders(<SlotPicker clinicId="1" />, PAGINATED);
+
+    await book("09:00");
+    const dialog = screen.getByRole("alertdialog");
+    // 送っているあいだに Esc を押しても、窓は閉じない
+    await userEvent.keyboard("{Escape}");
+    expect(dialog).toHaveAttribute("data-state", "open");
+    expect(within(dialog).getByRole("button", { name: "やめる" })).toBeDisabled();
+    // 窓の後ろの、ほかの時刻のボタンも押せない
+    expect(
+      screen.getByRole("button", { name: "1/7(月) 10:00 佐藤 一郎 を予約する", hidden: true }),
+    ).toBeDisabled();
+
+    release();
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/appointments"));
+    expect(requests).toBe(1);
+  });
+
   it("先にほかの人が予約していたら、「すでに埋まっています」と出し、埋まった枠を一覧から消す", async () => {
     let taken = false;
     server.use(

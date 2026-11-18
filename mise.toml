@@ -1,5 +1,5 @@
 # このリポジトリで使う道具の版。版は正確に書く（全体の設定の "lts" に任せない）
-# Node と pnpm は、画面（apps/web・packages/ui）で使う
+# Node と pnpm は、画面（apps/patient・clerk・doctor・packages）で使う
 # pnpm は npm のレジストリから入れる（mise の既定の取得元は、手元でダウンロードが止まったため）
 # Ruby と PostgreSQL は Docker で動かす（版は docker/api/Dockerfile と compose.yaml）
 [tools]

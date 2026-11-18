@@ -29,6 +29,18 @@ RSpec.describe "3つの入口のスキーマ" do
     expect(root_fields(DoctorApi::Schema, :mutation)).to eq(%w[closeSlot createSlots finishConsultation login logout startConsultation])
   end
 
+  # 入口で絞っているが、resolver の中の役割の確かめも、守りとして残している。
+  # 入口を取り違えた（医師を事務スタッフの入口で実行した）ときに、何も返さないことを確かめる
+  it "事務スタッフの入口でも、事務スタッフでない人には、料金の表・ダッシュボード・監査ログは空" do
+    doctor = create(:doctor, admin: true)
+    create(:fee_item, clinic: doctor.clinic)
+    query = '{ feeItems { id } dashboard(from: "2030-01-01", to: "2030-01-07") { total } auditLogs { edges { node { id } } } }'
+
+    result = execute_graphql(query, user: doctor, audience: "clerk")
+
+    expect(result["data"]).to eq("feeItems" => [], "dashboard" => [], "auditLogs" => { "edges" => [] })
+  end
+
   it "ほかの入口の操作は、スキーマにないので、実行の前に断られる" do
     patient = create(:patient)
 

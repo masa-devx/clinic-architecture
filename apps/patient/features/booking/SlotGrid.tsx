@@ -11,11 +11,13 @@ type Props = {
   // 予約するのか、今の予約の時刻を変えるのか（ボタンと確認の言葉が変わる）
   mode: "book" | "reschedule";
   onSelect: (slotId: string) => Promise<void>;
+  // 予約を送っているあいだは、どの時刻のボタンも押せない（2回送らない）
+  busy: boolean;
 };
 
 // 空いている枠を、日ごと・医師ごとにまとめて、時刻のボタンで並べる。押すと、確認してから予約する。
 // props だけで描く（データは取らない）
-export function SlotGrid({ slots, clinicName, mode, onSelect }: Props) {
+export function SlotGrid({ slots, clinicName, mode, onSelect, busy }: Props) {
   // 日 → 医師 → 枠、の順にまとめる
   const days = new Map<string, Map<string, Slot[]>>();
   for (const slot of slots) {
@@ -49,6 +51,7 @@ export function SlotGrid({ slots, clinicName, mode, onSelect }: Props) {
                         variant="outline"
                         colorPalette="teal"
                         className="tabular"
+                        disabled={busy}
                         aria-label={`${day} ${time} ${doctorName} を${mode === "book" ? "予約する" : "選ぶ（この時刻に変える）"}`}
                         title={mode === "book" ? "この内容で予約しますか？" : "この時刻に変えますか？"}
                         description={`${day} ${time}〜${formatTime(slot.endsAt)}　${clinicName}　${doctorName} 医師`}

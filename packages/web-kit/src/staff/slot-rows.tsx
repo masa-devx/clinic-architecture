@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, HStack, Heading, Stack, Text } from "@chakra-ui/react";
 import { ConfirmButton } from "@clinic/ui/confirm-button";
 import { Surface } from "@clinic/ui/surface";
 import { formatDate, formatTime } from "../datetime";
@@ -9,8 +9,8 @@ type Props = {
   slots: readonly Slot[];
   // 枠を閉じる。閉じられる枠（canClose）にだけ、ボタンを出す
   onClose: (slotId: string) => Promise<void>;
-  // 枠を選ぶ操作（代わりに予約する・この時刻に変える）。渡さなければ、出さない
-  select?: { label: string; onSelect: (slotId: string) => void };
+  // 枠を選ぶ操作（代わりに予約する・この時刻に変える）。確認の窓を出してから送る。渡さなければ、出さない
+  select?: { label: string; confirmTitle: string; onSelect: (slotId: string) => Promise<void> };
   // 送っている最中の枠。そのボタンを「送信中」にし、ほかのボタンは押せなくする（2回送らない）
   busyId: string | null;
 };
@@ -68,16 +68,18 @@ export function SlotRows({ slots, onClose, select, busyId }: Props) {
                       </ConfirmButton>
                     ) : null}
                     {select ? (
-                      <Button
+                      <ConfirmButton
                         size="sm"
                         colorPalette="teal"
-                        loading={busyId === slot.id}
                         disabled={busyId !== null}
                         aria-label={`${name} を選ぶ（${select.label}）`}
-                        onClick={() => select.onSelect(slot.id)}
+                        title={select.confirmTitle}
+                        description={`${name}〜${formatTime(slot.endsAt)}`}
+                        confirmLabel={select.label}
+                        onConfirm={() => select.onSelect(slot.id)}
                       >
                         {select.label}
-                      </Button>
+                      </ConfirmButton>
                     ) : null}
                   </HStack>
                 </HStack>

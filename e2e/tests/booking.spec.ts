@@ -105,14 +105,18 @@ test("事務スタッフが、患者の代わりに予約を入れ、枠を閉�
 
   // メールアドレスを入れずに押すと、送らずに止める。登録のないメールアドレスは、断られる
   await choices.last().click();
+  await confirm(page, "代わりに予約する");
   await expect(page.getByText("患者のメールアドレスを入れてください")).toBeVisible();
   await page.getByLabel("代わりに予約を入れる患者のメールアドレス").fill("nobody@example.com");
   await choices.last().click();
+  await expect(page.getByRole("alertdialog")).toContainText("nobody@example.com さまの代わりに");
+  await confirm(page, "代わりに予約する");
   await expect(page.getByText("このメールアドレスの患者が見つかりません")).toBeVisible();
 
   await page.getByLabel("代わりに予約を入れる患者のメールアドレス").fill(PATIENT.email);
   const target = (await choices.last().getAttribute("aria-label"))!.match(/^(\S+) (\S+) (\S+ \S+) を/)!;
   await choices.last().click();
+  await confirm(page, "代わりに予約する");
   await expect(page.getByText("予約しました")).toBeVisible();
 
   // 空いている枠を1つ閉じると、一覧から消える
@@ -165,5 +169,5 @@ test("スタッフの一覧の絞り込みは URL に残り、リロードして
   await page.reload();
   await expect(page.getByLabel("状態")).toHaveValue("CANCELED");
   await expect(page.getByText("条件に合う予約はありません").or(page.getByRole("table"))).toBeVisible();
-  await expect(page.getByRole("row").filter({ hasText: "予約済" })).toHaveCount(0);
+  await expect(page.getByRole("cell", { name: "予約済", exact: true })).toHaveCount(0);
 });

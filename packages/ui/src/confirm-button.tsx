@@ -14,7 +14,8 @@ type Props = Omit<ButtonProps, "onClick" | "title"> & {
   onConfirm: () => void | Promise<void>;
 };
 
-// 押すと、確認の窓を出してから実行するボタン。取り消す・確定するなど、押し間違えると困る操作に使う
+// 押すと、確認の窓を出してから実行するボタン。取り消す・確定するなど、押し間違えると困る操作に使う。
+// 実行しているあいだは、窓を閉じさせない（閉じられると、後ろのほかのボタンを押せてしまい、2つ目の操作が並んで送られる）
 export function ConfirmButton({
   title,
   description,
@@ -41,7 +42,11 @@ export function ConfirmButton({
     <Dialog.Root
       role="alertdialog"
       open={open}
-      onOpenChange={(event) => setOpen(event.open)}
+      onOpenChange={(event) => {
+        if (!running) setOpen(event.open);
+      }}
+      closeOnEscape={!running}
+      closeOnInteractOutside={!running}
       lazyMount
       unmountOnExit
     >
