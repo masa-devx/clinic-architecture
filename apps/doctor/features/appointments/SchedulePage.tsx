@@ -4,7 +4,8 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import { Box, Button, Center, HStack, Heading, IconButton, Input, Stack, Text } from "@chakra-ui/react";
 import { EmptyMessage, ErrorMessage, LoadingMessage } from "@clinic/ui/state-message";
 import { notifyError, notifySuccess } from "@clinic/ui/toaster";
-import { addDays, formatDate, isDateString, toDateInTokyo } from "@clinic/web-kit/datetime";
+import { addDays, formatDate, isDateString } from "@clinic/web-kit/datetime";
+import { useTodayInTokyo } from "@clinic/web-kit/use-today";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
@@ -14,22 +15,29 @@ import {
 } from "./appointments.graphql";
 import { ScheduleItem } from "./ScheduleItem";
 
+const POLL_INTERVAL = 30_000;
+
 // 1日の、自分が担当の予約。開いたときは今日。見ている日は URL に置く（?date=YYYY-MM-DD）
 export function SchedulePage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  // 「今日」は、画面を開いたときに1回だけ決める
-  const [today] = useState(() => toDateInTokyo(new Date()));
+  // 開いたまま日付をまたいだら、「今日」も新しい日になる（URL に日付がなければ、予定も次の日に変わる）
+  const today = useTodayInTokyo();
   const dateParam = searchParams.get("date");
   const date = isDateString(dateParam) ? dateParam : today;
+  // 続きを読み込んだ日。取り直し（ポーリング）は最初のページだけを取り、読み込んだ続きを消してしまうので、その日を見ているあいだは止める
+  const [extendedDate, setExtendedDate] = useState<string | null>(null);
+  const extended = extendedDate === date;
 
   const { data, loading, error, fetchMore, refetch } = useQuery(ScheduleDocument, {
     // キャンセルした予約は、予定から外す（状態で絞らず、画面で外すと、件数とページがずれる）
     variables: { filter: { from: date, to: date } },
     fetchPolicy: "cache-and-network",
     // 受付は患者がする。受付済になったことに気づけるように、30秒ごとに取り直す
-    pollInterval: 30_000,
+    pollInterval: extended ? 0 : POLL_INTERVAL,
+    // 画面が隠れているとき・通信が切れているときは、取り直さない（失敗の知らせを出し続けない）
+    skipPollAttempt: () => document.hidden || !navigator.onLine,
   });
   const [start] = useMutation(StartConsultationDocument);
   const [finish] = useMutation(FinishConsultationDocument);
@@ -62,6 +70,8 @@ export function SchedulePage() {
   };
 
   const onFinish = async (appointmentId: string) => {
+    // 終えるのを送っているあいだも、ほかの予約のボタンは押せなくする（始めるときと同じ）
+    setBusyId(appointmentId);
     try {
       const result = await finish({ variables: { appointmentId } });
       await finishWith(
@@ -70,6 +80,8 @@ export function SchedulePage() {
       );
     } catch {
       // 同上
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -77,6 +89,7 @@ export function SchedulePage() {
     setLoadingMore(true);
     try {
       await fetchMore({ variables: { after: data?.appointments.pageInfo.endCursor } });
+      setExtendedDate(date);
     } catch {
       // 同上
     } finally {

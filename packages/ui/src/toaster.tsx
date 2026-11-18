@@ -9,8 +9,10 @@ export function notifySuccess(title: string) {
   toaster.create({ type: "success", title });
 }
 
+// 同じ文の知らせは、重ねて出さない（同じ id で作ると、出ているものを置き換える）。
+// 取り直し（ポーリング）が続けて失敗しても、知らせが積み上がらない
 export function notifyError(title: string, description?: string) {
-  toaster.create({ type: "error", title, description });
+  toaster.create({ id: `error:${title}`, type: "error", title, description });
 }
 
 export function AppToaster() {
