@@ -1,12 +1,13 @@
 import { readdirSync } from "node:fs";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTypescript from "eslint-config-next/typescript";
 
 // 3つのアプリ（apps/patient・clerk・doctor）で共通の ESLint の設定。
+// Next.js の設定（eslint-config-next）は、それぞれのアプリの依存なので、アプリの側で読み込んで渡す
+// （ここはリポジトリのルートにあり、ルートからは、アプリの依存が見えない）
+//
 // 層の決まり（docs/frontend.md の1章）を、import の向きで止める
 //   app → features → lib・packages の向きにだけ import する
 //   features どうしは、直接 import しない（要るなら lib か packages に下ろすか、app で組み合わせる）
-export function createAppConfig(appUrl) {
+export function createAppConfig(appUrl, nextConfigs) {
   const features = readdirSync(new URL("./features", appUrl), { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name);
@@ -25,8 +26,7 @@ export function createAppConfig(appUrl) {
 
   return [
     { ignores: [".next/**", "next-env.d.ts", "lib/gql/**"] },
-    ...nextVitals,
-    ...nextTypescript,
+    ...nextConfigs,
     { rules: { "import/no-restricted-paths": ["error", { zones: layerZones }] } },
   ];
 }

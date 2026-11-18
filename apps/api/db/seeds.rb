@@ -1,6 +1,13 @@
 # 手元とテスト（E2E）で使う、決まった初期データ。何度流しても同じ結果になる
 # ログインの情報は、ここだけに書く（E2E も、ここの値を使う）。本番では流さない
-abort "初期データは、開発とテストの環境でだけ入れます" unless Rails.env.local?
+abort "初期データは、開発の環境でだけ入れます" unless Rails.env.local?
+
+# テストの DB には入れない（テストは、自分専用のデータを作る。初期データがあると、ファクトリーのメールアドレスとぶつかる）。
+# 新しく作ったテストの DB に `bin/rails db:prepare` を流すと、ここが呼ばれる（CI がそう）
+if Rails.env.test?
+  puts "初期データは、テストの DB には入れません"
+  return
+end
 
 # 手元だけの捨ててよい値
 PASSWORD = "password-for-local-only"
