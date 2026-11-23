@@ -70,7 +70,7 @@ RSpec.describe "受付〜会計（GraphQL を通す）" do
     expect(fetch.call(create(:patient))).to be_nil
   end
 
-  # 医師と患者の入口には、料金の表の操作そのものが載っていない（spec/graphql/schema_spec.rb）
+  # 医師と患者の入口には、料金の表の操作そのものが載っていない（test/graphql/schema_spec.rb）
   it "料金の表は、自院の分だけが出る" do
     create(:fee_item)
     query = "{ feeItems { name unitPrice } }"

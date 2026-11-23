@@ -4,7 +4,7 @@ require_relative "../config/environment"
 abort("本番の環境でテストは走らせません") if Rails.env.production?
 require "rspec/rails"
 
-Rails.root.glob("spec/support/**/*.rb").sort_by(&:to_s).each { |file| require file }
+Rails.root.glob("test/support/**/*.rb").sort_by(&:to_s).each { |file| require file }
 
 begin
   ActiveRecord::Migration.maintain_test_schema!

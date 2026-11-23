@@ -122,7 +122,7 @@ RSpec.describe "監査ログ" do
 
     it "会計の明細を読むと残る。状態と合計だけ・見られない人が開いたときは、残らない" do
       query = "query($id: ID!) { bill(id: $id) { id items { name } } }"
-      # 医師の入口には、会計の操作そのものが載っていない（spec/graphql/schema_spec.rb）
+      # 医師の入口には、会計の操作そのものが載っていない（test/graphql/schema_spec.rb）
       execute_graphql(query, variables: { id: appointment.bill.id.to_s }, user: create(:patient), now: now)
       execute_graphql(query, variables: { id: appointment.bill.id.to_s }, user: create(:clerk), now: now)
       execute_graphql("query($id: ID!) { bill(id: $id) { id status totalAmount } }", variables: { id: appointment.bill.id.to_s }, user: patient, now: now)
@@ -181,7 +181,7 @@ RSpec.describe "監査ログ" do
       expect(logs.last).to include("action" => "APPOINTMENT_BOOK", "actorKind" => "PATIENT", "actorName" => patient.name)
     end
 
-    # 医師と患者の入口には、監査ログの操作そのものが載っていない（spec/graphql/schema_spec.rb）
+    # 医師と患者の入口には、監査ログの操作そのものが載っていない（test/graphql/schema_spec.rb）
     it "管理者でない事務スタッフ・ほかの医療機関の管理者には、何も出ない" do
       run_whole_flow
 
