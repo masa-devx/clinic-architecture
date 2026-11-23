@@ -23,6 +23,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | パッケージ管理 | pnpm（workspace） | Node 26.13.1・pnpm 12.21.0 | 1つのリポジトリで、スキーマと画面を一緒に変える |
 | テスト | RSpec＋FactoryBot＋Bullet／Vitest＋Testing Library＋MSW・Playwright | rspec-rails 8.1・Vitest 5.1・MSW 3.0・Playwright 1.65 | [docs/frontend.md](docs/frontend.md) のテストの層 |
 | 静的検査・整形 | RuboCop／ESLint・Prettier | rubocop-rails-omakase／ESLint 9.39（eslint-config-next の中のプラグインが 10 にまだ対応していないため）・Prettier 3.10 | — |
+| Ruby の型 | Sorbet（`srb tc`・sorbet-runtime）・tapioca（gem と Rails の RBI を作る） | sorbet・sorbet-runtime 0.6.13715・tapioca 0.20.0（2026-11-23 に入れた。[D-021](docs/decisions.md)） | 業務の処理・集計・lib の引数と戻り値を、型で止める。`typed: true` は `app/services`・`app/queries`・`lib`、ほかは `typed: false` |
 | 手元の環境 | Docker Compose | — | コマンド1つで立ち上がる |
 | ジョブ・メール | Solid Queue・Action Mailer・Mailpit（手元の受信箱） | solid_queue 1.7・Mailpit 1.33 | DB にジョブを置く。Redis が要らない |
 | あとから入れるもの | Stripe（テストモード）・strong_migrations・Packwerk・Sentry・Storybook＋Chromatic・Renovate | — | その機能を作る段階で入れる（Bullet と Dataloader は、段階1で入れた） |
@@ -71,6 +72,8 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | テスト（バックエンド） | `docker compose run --rm api bundle exec rspec` | DB が起動している | — |
 | テスト（フロントエンド） | `pnpm test`（Vitest）／`pnpm e2e`（Playwright。API と DB を起動し、初期データを入れ直してから走る。初回は `pnpm --filter e2e exec playwright install chromium`） | Docker | — |
 | 静的検査 | `docker compose run --rm api bin/rubocop`／`pnpm lint`・`pnpm typecheck`・`pnpm format:check` | — | `next lint`（Next.js 16 でなくなった） |
+| 型を調べる（バックエンド） | `docker compose run --rm api bundle exec srb tc` | — | — |
+| RBI を作り直す（バックエンド） | `docker compose run --rm api bin/tapioca dsl`（モデル・関連・enum・ジョブ・ルートを変えたとき。設定でテストの環境で作る）／`docker compose run --rm api bin/tapioca gem`（gem を足した・上げたとき）。古くないかは `bin/tapioca dsl --verify` | テストの DB がある（RSpec を一度流していればある） | `sorbet/rbi/` の生成物を手で直す（作り直すと消える） |
 | スキーマから型を作る | `docker compose run --rm api bin/rails graphql:dump` → `pnpm codegen`（画面の `.graphql` だけを変えたときは `pnpm codegen` だけ） | スキーマ（型・resolver・mutation）か、画面の `.graphql` を変えたとき | 型を手で書く・`.generated.ts` を手で直す |
 | マイグレーション | `docker compose run --rm api bin/rails db:migrate` | — | — |
 | 初期データを入れ直す | `docker compose run --rm api bin/rails db:seed`（何度流しても同じ結果） | — | — |
