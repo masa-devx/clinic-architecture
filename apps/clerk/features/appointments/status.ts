@@ -1,5 +1,5 @@
 import { APPOINTMENT_STATUS_LABELS } from "@clinic/web-kit/labels";
-import type { AppointmentStatus } from "@/lib/gql/graphql";
+import type { AppointmentStatus } from "@/types/__generated__/graphql";
 
 // 状態の一覧は、サーバーのスキーマ（AppointmentStatus）が正。呼び方は、3つの画面で共通（web-kit）。
 // スキーマに状態が増えると、ここで型のエラーになる

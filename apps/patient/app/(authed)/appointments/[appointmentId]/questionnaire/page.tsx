@@ -1,4 +1,4 @@
-import { QuestionnairePage } from "@/features/questionnaire/QuestionnairePage";
+import { QuestionnairePage } from "@/features/questionnaire/components/QuestionnairePage";
 
 export default async function Page({ params }: { params: Promise<{ appointmentId: string }> }) {
   const { appointmentId } = await params;

@@ -1,0 +1,12 @@
+query Me {
+  me {
+    id
+    kind
+    name
+    staffMemberId
+    clinic {
+      id
+      name
+    }
+  }
+}

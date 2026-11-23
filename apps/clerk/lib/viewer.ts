@@ -1,12 +1,16 @@
+import { addTypenameToDocument } from "@apollo/client/utilities";
 import { fetchGraphqlOnServer } from "@clinic/web-kit/server";
 import { print } from "graphql";
 import { redirect } from "next/navigation";
-import type { MeQuery } from "@/lib/gql/graphql";
-import { MeDocument, type Viewer } from "./viewer.graphql";
+import { MeDocument, type MeQuery } from "./graphql/viewer.generated";
 
-// サーバーの部品から、このアプリにログインしている人を Rails に聞く
+// ログインしている人
+export type Viewer = NonNullable<MeQuery["me"]>;
+
+// サーバーの部品から、このアプリにログインしている人を Rails に聞く。
+// 生成した型は、Apollo Client と同じく __typename があるものとして作っている。ここは Apollo Client を通らないので、送るクエリに __typename を足す
 export async function fetchViewer(): Promise<Viewer | null> {
-  const data = await fetchGraphqlOnServer<MeQuery>("clerk", print(MeDocument));
+  const data = await fetchGraphqlOnServer<MeQuery>("clerk", print(addTypenameToDocument(MeDocument)));
   return data?.me ?? null;
 }
 

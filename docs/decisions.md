@@ -170,7 +170,7 @@
   - **描く場所**: サーバーの部品は、レイアウトとログインの確認だけ。データを取る所は、ブラウザの部品（Apollo Client の `useQuery`）。サーバーで先にデータを取って描く形（`PreloadQuery`）は、まだ入れていない（表示速度を測ってから決める）
   - **Chakra UI と App Router**: Emotion のスタイルを、`useServerInsertedHTML` でまとめて流す（今は `packages/web-kit/src/emotion-registry.tsx`）。入れないと、サーバーの HTML とブラウザの描画が食い違う（Hydration failed）
   - **状態の置き場**: サーバーの状態は Apollo のキャッシュ、絞り込みとタブは URL、フォームは React Hook Form＋Zod、ログインしている人は Context（サーバーで確かめた値を配る）
-  - **型**: スキーマ（今は `apps/api/schema/` の3つ）とクエリから作る（client-preset）。行に要る項目は、行を描く部品の隣の fragment で決める
+  - **型**: スキーマ（今は `apps/api/schema/` の3つ）とクエリから作る（client-preset）。行に要る項目は、行を描く部品の隣の fragment で決める（2026-11-23 に、型の作り方と fragment の隠し方は D-020 で置き換えた）
   - **mutation のあとのキャッシュ**（操作ごと）:
 
     | 操作 | 直し方 | 理由 |
@@ -326,3 +326,21 @@
   - 開発の環境でだけ動く（テスト・本番では止まる）
 - 弱点・やめる条件: 問診・監査ログ・通知（outbox）は入れていない（問診の答えは、アプリの中で暗号にするので SQL では作れない）。それらの表の実行計画を読むときは、足す。分布は作ったもので、本物の偏り（曜日・季節・人気の医師）はない
 - 確かめた数字（手元の Docker・PostgreSQL 18.7、2026-11-19）: 予約 1,000,000・診療枠 1,112,576・会計 840,725・患者 100,000 が 77秒で入った（枠 32秒・予約 23秒・会計 20秒）。表の大きさは、予約 199MB・枠 382MB（インデックスを含む）。件数を小さくした RSpec 5件で、件数・偏り・状態と時刻・ログイン・入れ直し・ほかのデータに触らないことを確かめた
+
+## D-020. GraphQL の型の作り方を、Apollo Client がすすめる形に替え、fragment の中身は Apollo Client の data masking で隠す
+
+- 日付: 2026-11-23 ／ 課題: F-9 ／ 状態: 決定
+- 困ったこと: 型は `@graphql-codegen/client-preset` で作り、fragment の中身は codegen の fragment masking（`getFragmentData`）で隠していた。Apollo Client の公式ドキュメント（GraphQL Codegen の章）は、client preset を Apollo Client と使うことを、すすめていない。codegen の fragment masking は型の上だけの仕組みで、Apollo Client の data masking（実行のときにも隠す・`useFragment` で子の部品だけが読む・子のデータだけが変わったときに親を描き直さない）とは、一緒に使えない。クエリは `.ts` の中の `graphql()` の文字列で書いていて、`lib/gql/` に3つのアプリ分の大きな生成物が1か所にまとまっていた。テストは部品の隣にあり、形（正常系・異常系の分け方）もファイルごとに違った
+- 比べた案:
+  - 案A: **client-preset のまま**（codegen の fragment masking を使い続ける）: 変える量が0。`graphql()` を書いた所で型が付く ／ Apollo がすすめない形のまま。隠すのは型だけで、実行のときは親から子の項目が読めてしまう。data masking を入れられない
+  - 案B: client-preset のまま、`fragmentMasking: false` にして、Apollo Client の data masking を入れる: クエリの書き方（`.ts` の中の `graphql()`）を変えずに済む ／ 生成物は `lib/gql/` の1か所にまとまったまま。Apollo のドキュメントは、これも「すすめない形の中での回避策」として書いている
+  - 案C: **near-operation-file-preset＋typescript-operations＋typed-document-node＋Apollo Client の data masking**: Apollo のドキュメントがすすめる形。`.graphql` の隣に、その操作の型だけができる（探す場所が1つ・差分が小さい）。enum と入力の型は `types/__generated__/graphql.ts` に1回だけ ／ クエリを `.graphql` に移す手間。`.graphql` を足したら `pnpm codegen` を流すまで import できない。生成物のファイルが増える（3つのアプリで20ファイル）
+- 選んだもの: 案C
+  - 版: `@graphql-codegen/cli` 8.0.0・`typescript-operations` 7.0.2・`near-operation-file-preset` 6.0.2・`typed-document-node` 8.0.0。Apollo のドキュメントの例は typescript-operations 6 向けなので、7 の CHANGELOG と型定義の説明を確かめた（7 で変わったのは、graphql 16 以上・Node 22.18 以上・`emitLegacyCommonJSImports` の削除だけで、使う設定は 6 と同じ）
+  - 設定: scalars（`ISO8601DateTime`・`ISO8601Date` は `string`）と enum を文字列の合併型で出すのは、前と同じ（6 から `enumsAsTypes` の代わりに `enumType: "string-literal"`）。Apollo がすすめる `nonOptionalTypename`・`skipTypeNameForRoot`。data masking のために `inlineFragmentTypes: "mask"`・`customDirectives: { apolloUnmask: true }`。型は各アプリの `types/apollo-client.d.ts` で `TypeOverrides` を `GraphQLCodegenDataMasking.TypeOverrides` に合わせる
+  - **data masking での部品の分け方**（[frontend.md](frontend.md) の1章）: 子の部品の fragment は、子が `useFragment` で読み、読んだ値を props だけで描く `〜View` に渡す（患者の予約のカード・事務スタッフの予約の表の行・医師の予定の1件）。取った画面が自分で読む fragment（mutation と同じ形を受け取るために分けているもの）は、クエリの側で `@unmask`（患者の問診・事務スタッフの会計）。子の fragment の項目を別の画面で使っていた所（医師の問診の画面が、予定の1件の fragment から患者の名前と時刻を読んでいた）は、その画面のクエリで項目を直接選ぶ形に直した
+  - サーバーの部品で聞く「ログインしている人」（Apollo Client を通らない）は、送るクエリに `addTypenameToDocument` で `__typename` を足す。生成した型が、`__typename` があるものとして作られているため
+  - フォルダ: `features/<機能>/graphql/`（`.graphql` と `.generated.ts`）・`components/`・直下に計算と変換。テストは各パッケージの `test/` に、同じ並びで置く（どのファイルも、先頭にデータ、その下に `describe("正常系")` と `describe("異常系")`）
+- 理由: Apollo Client を使い続けるので、Apollo がすすめる形に寄せると、Apollo の機能（data masking・`useFragment`）とドキュメントがそのまま使える。data masking は、型だけでなく実行のときも隠すので、親の部品が子の項目に頼る書き方（D-010 の「行に要る項目は、行を描く部品の隣の fragment で決める」を破る書き方）が、型と画面の両方で止まる。実際に、医師の問診の画面が子の fragment を読んでいたのが見つかった
+- 弱点・やめる条件: `.generated.ts` が `.graphql` の隣に増え、PR の差分に生成物が混ざる（整形と ESLint からは外している）。`useFragment` は Apollo Client のキャッシュから読むので、子の部品（`〜View` でないほう）を描くには Apollo Client が要る。Storybook を入れるときは `〜View` を載せる。`typescript-operations` 7.0.2 は、入れた日の前日に出たばかりの版。生成物がおかしくなったら、7.0.1 に戻して比べる。codegen を使わない形（gql.tada など）は、比べていない
+- 確かめた数字: Vitest の件数は、前と後で同じ（web-kit 15・患者 10・事務スタッフ 15・医師 7）。`pnpm codegen` を2回流して、20の生成物が同じになることを確かめた。E2E は CI で確かめる（手元では流していない）

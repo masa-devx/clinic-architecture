@@ -1,0 +1,16 @@
+query Me {
+  me {
+    id
+    kind
+    name
+    canViewAuditLogs
+    clinic {
+      id
+      name
+      doctors {
+        id
+        name
+      }
+    }
+  }
+}

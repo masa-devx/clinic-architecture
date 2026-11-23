@@ -1,4 +1,4 @@
-import type { QuestionKind } from "@/lib/gql/graphql";
+import type { QuestionKind } from "@/types/__generated__/graphql";
 
 // 問診のフォームの値と、サーバーとのやり取りの形の変換。通信もしないし、時計も読まない
 

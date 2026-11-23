@@ -1,0 +1,63 @@
+# 問診の画面に要る項目（質問・保存してある答え・誰の、いつの予約か）
+fragment QuestionnaireDetail on Appointment {
+  id
+  canViewQuestionnaire
+  canAnswerQuestionnaire
+  questionnaireQuestions {
+    id
+    label
+    kind
+    options
+    required
+  }
+  questionnaire {
+    id
+    submitted
+    submittedAt
+    answers {
+      questionId
+      label
+      kind
+      text
+      selected
+    }
+  }
+  patient {
+    id
+    name
+  }
+  slot {
+    id
+    startsAt
+    doctor {
+      id
+      name
+    }
+    clinic {
+      id
+      name
+    }
+  }
+}
+
+# この fragment を読むのは、取った画面（QuestionnairePage）自身なので、@unmask で中身を見せる
+query Questionnaire($appointmentId: ID!) {
+  appointment(id: $appointmentId) {
+    id
+    ...QuestionnaireDetail @unmask
+  }
+}
+
+mutation SaveQuestionnaire($appointmentId: ID!, $answers: [QuestionnaireAnswerInput!]!, $submit: Boolean!) {
+  saveQuestionnaire(appointmentId: $appointmentId, answers: $answers, submit: $submit) {
+    appointment {
+      id
+      ...QuestionnaireDetail
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}

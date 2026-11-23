@@ -1,5 +1,5 @@
 import { PageHeader } from "@clinic/ui/page-header";
-import { SlotsPage } from "@/features/slots/SlotsPage";
+import { SlotsPage } from "@/features/slots/components/SlotsPage";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ reschedule?: string }> }) {
   const { reschedule } = await searchParams;

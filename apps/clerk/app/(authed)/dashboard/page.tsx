@@ -1,5 +1,5 @@
 import { PageHeader } from "@clinic/ui/page-header";
-import { DashboardPage } from "@/features/dashboard/DashboardPage";
+import { DashboardPage } from "@/features/dashboard/components/DashboardPage";
 
 export default function Page() {
   return (
