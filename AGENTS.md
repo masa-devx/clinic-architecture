@@ -96,7 +96,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 
 ### 作業の流れ
 
-実践の課題（[docs/practice.md](docs/practice.md)）は、役を分けて進める。**何を・なぜ・どの順で**は [pm](agents/skills/pm/SKILL.md)、**どう作るか・どこまでで終わりか**は [tech-lead](agents/skills/tech-lead/SKILL.md)。どちらも、相手が考える前に答えを出さない。
+実践の課題（[docs/practice.md](docs/practice.md)）は、クライアント（患者・医師・医療機関）から要望が届く想定（[docs/clients.md](docs/clients.md)）で、役を分けて進める。**作る・作らない・何を先に**は PdM の [pdm](agents/skills/pdm/SKILL.md)（ビジネスサイドと打ち合わせて決める）、**仕様をプロジェクトに落とし込み、どう進めるか**はプロジェクトリーダーの [tech-lead](agents/skills/tech-lead/SKILL.md)。打ち合わせは [docs/meetings/](docs/meetings/README.md) に残す。どちらも、相手が考える前に答えを出さない。終えた課題は、面接で語る形で [docs/stories/](docs/stories/README.md) に残す。
 
 1. 段階1までは、解説で止まらずに実装する（[docs/decisions.md](docs/decisions.md) の D-002）。段階2より先の進め方は、段階1が終わってから決める
 2. 確かめたいことは、テストで書く。守りを外すとテストが落ちることを確かめる（例: UNIQUE を外すと、同時に20件の予約が20件とも成功する）
