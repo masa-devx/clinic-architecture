@@ -68,8 +68,8 @@ jobs:
         # まだコミットしていない生成物（新しい .graphql の隣）も見つけるため、追跡していないファイルも確かめる
         run: |
           pnpm codegen
-          git add --intent-to-add -- 'apps/*/types/__generated__' 'apps/*/**/*.generated.ts'
-          git diff --exit-code -- 'apps/*/types/__generated__' 'apps/*/**/*.generated.ts'
+          git add --intent-to-add -- 'apps/*/types/__generated__/*' 'apps/*/**/*.generated.ts'
+          git diff --exit-code -- 'apps/*/types/__generated__/*' 'apps/*/**/*.generated.ts'
       - name: 整形
         run: pnpm format:check
       - name: ESLint
