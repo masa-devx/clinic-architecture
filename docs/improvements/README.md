@@ -1,6 +1,6 @@
 # 課題と改善の記録
 
-1件1ファイル。名前は `<番号>-<英小文字の kebab-case>.md`（例：`K1-double-booking.md`・`F2-request-waterfall.md`）。番号は [../requirements.md](../requirements.md) の 11章（K はバックエンド、F はフロントエンド）。
+1件1ファイル。名前は `<番号>-<英小文字の kebab-case>.md`（例：`K1-double-booking.md`・`F2-request-waterfall.md`）。番号は [../requirements.md](../requirements.md) の 11章（K はバックエンド、F はフロントエンド）か、要望の番号（R。[../clients.md](../clients.md) の3章）。
 
 ## 一覧
 
@@ -8,6 +8,7 @@
 | --- | --- | --- | --- |
 | [K1](K1-double-booking.md) | 同じ枠に、同時に2件の予約が入る | 1 | 20件中の成功: 20件 → 1件 |
 | [K10](K10-mail-not-sent.md) | 予約は入ったのに、メールが出ないことがある | 5 | 「前」はない。記録の失敗で予約も入らない・送る失敗で記録が残る、を確かめた |
+| [R-1](R-1-appointment-list.md) | 大きな院で、予約の一覧（いつからでも）が遅い | E-1 | 1本目の SQL: 155 ms → 1 ms・API 全体: 約250 ms → 約40 ms |
 
 ## 書く形
 

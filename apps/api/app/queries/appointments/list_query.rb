@@ -18,6 +18,11 @@ module Appointments
     def relation
       # 並びのキー（枠の開始時刻）を、予約の行と一緒に読んでおく。カーソルを作るときに枠を読み直さないため
       relation = AppointmentPolicy.scope(@actor).joins(:slot).select("appointments.*", "slots.starts_at AS slot_starts_at")
+      # スタッフは、枠の医療機関でも絞る。予約と枠の医療機関は、組の外部キーで必ず同じなので、結果は変わらない。
+      # 絞る列（予約の医療機関）と並べる列（枠の開始時刻）が別の表にあると、DB は医療機関の予約を全部読んで並べ替える。
+      # 枠の側で絞れば、枠の索引（clinic_id, starts_at, id）を時刻の順にたどり、1ページ分そろった所で止まれる
+      # （医師30人・予約28万件の院で、155 ms → 1 ms。docs/improvements/R-1-appointment-list.md）
+      relation = relation.where(slots: { clinic_id: @actor.clinic_id }) if @actor.is_a?(StaffMember)
       relation = relation.where("slots.starts_at >= ?", Time.zone.local(@from.year, @from.month, @from.day)) if @from
       relation = relation.where("slots.starts_at < ?", Time.zone.local(@to.year, @to.month, @to.day) + 1.day) if @to
       relation = relation.where(slots: { doctor_id: @doctor_id }) if @doctor_id
