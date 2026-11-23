@@ -10,10 +10,10 @@
 
 ## 2. 測った
 
-`apps/api/spec/services/notifications/notifications_spec.rb`。
+`apps/api/test/services/notifications/notifications_spec.rb`。
 
 ```sh
-docker compose run --rm api bundle exec rspec spec/services/notifications
+docker compose run --rm api bundle exec rspec test/services/notifications
 ```
 
 ## 3. 原因

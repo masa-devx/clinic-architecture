@@ -7,6 +7,8 @@ secrets/
 
 # Claude Code の手元だけの設定（許可した操作の記録など）
 .claude/settings.local.json
+# 作業場所を分けたとき（git worktree）にできるフォルダ
+.claude/worktrees/
 
 # 手元だけのメモ（実務の経験の深掘りなど、公開しないもの）
 private/

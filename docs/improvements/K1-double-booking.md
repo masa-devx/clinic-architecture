@@ -10,10 +10,10 @@
 
 ## 2. 測った
 
-同じ枠に、別々の患者20人の予約を、同時に送るテスト（`apps/api/spec/services/appointments/book_spec.rb` の「同じ枠に、同時に20件の予約が来たとき」）。スレッド20本が、それぞれ別の接続で `Appointments::Book` を呼ぶ。全員の準備ができてから、同時に走り出す。
+同じ枠に、別々の患者20人の予約を、同時に送るテスト（`apps/api/test/services/appointments/book_spec.rb` の「同じ枠に、同時に20件の予約が来たとき」）。スレッド20本が、それぞれ別の接続で `Appointments::Book` を呼ぶ。全員の準備ができてから、同時に走り出す。
 
 ```sh
-docker compose run --rm api bundle exec rspec spec/services/appointments/book_spec.rb -e "同時に20件"
+docker compose run --rm api bundle exec rspec test/services/appointments/book_spec.rb -e "同時に20件"
 ```
 
 「前」は、テスト用の DB で `DROP INDEX index_appointments_on_slot_id_active` を流してから、同じテストを走らせた。
@@ -38,4 +38,4 @@ docker compose run --rm api bundle exec rspec spec/services/appointments/book_sp
 ## 6. 再発防止
 
 - 上のテストが、RSpec の中で毎回走る（CI にも入れた。CI での実行は未確認）
-- `apps/api/spec/models/constraints_spec.rb` が、検証を飛ばして直接 DB に書いても2件目が入らないことを確かめる
+- `apps/api/test/models/constraints_spec.rb` が、検証を飛ばして直接 DB に書いても2件目が入らないことを確かめる
