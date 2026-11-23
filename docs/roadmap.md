@@ -74,13 +74,13 @@ flowchart LR
 | 決済 | 〔不明〕 | Stripe のテストモード | — | 5 |
 | 冪等キー・outbox | — | 自分で作る | 二重課金・メールが出ない、を再現する | 5 |
 | 安全なマイグレーション | 段階を分けたリリース（`ignored_columns`） | strong_migrations＋同じ手順 | 大きな表への変更で、画面が止まる | 6 |
-| モジュールの境界 | Packwerk・Sorbet | Packwerk（Sorbet は入れない） | 予約・会計・通知が、互いの中を直接さわり始める | 6 |
+| モジュールの境界 | Packwerk・Sorbet | Packwerk（Sorbet は 2026-11-23 に入れた。[D-021](decisions.md)） | 予約・会計・通知が、互いの中を直接さわり始める | 6 |
 | エラーの監視 | Sentry・Datadog・CloudWatch | Sentry（無料の枠） | 手元で気づけないエラーを見たい | 6 |
 | 部品のカタログと VRT | Storybook＋Chromatic | Storybook＋Chromatic（reg-suit と比べる） | ライブラリを上げたら、見た目が崩れた | 6 |
 | ライブラリの自動更新 | — | Renovate | 更新が手作業でたまる | 6 |
 | 本番の置き場 | AWS ECS（Fargate）・Terraform | 同じ形を、短い期間だけ立てる | — | 7 |
 
-**入れないもの**: Sorbet（型の学習は TypeScript 側で足りる。Ruby の型まで広げると焦点がぼける）、Kubernetes、React Native、ビデオ通話。
+**入れないもの**: Kubernetes、React Native、ビデオ通話。Sorbet は、はじめ「型の学習は TypeScript 側で足りる」として入れない予定だったが、2026-11-23 に入れると決め直した（判断は [decisions.md](decisions.md) の D-021）。
 
 ### 選定で話せるようにする4つの比較
 
