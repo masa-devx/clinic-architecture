@@ -1,3 +1,5 @@
+# typed: false
+
 # 医師用の入口（POST /graphql/doctor）
 module DoctorApi
   class Schema < BaseSchema

@@ -1,6 +1,16 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
+# 既定で外している所（vendor・tmp・node_modules など）に、下の Exclude を足す（置き換えない）
+inherit_mode:
+  merge:
+    - Exclude
+
+# Sorbet の生成物（tapioca が作る RBI と、その設定）は、手で直さないので調べない
+AllCops:
+  Exclude:
+    - "sorbet/**/*"
+
 # Overwrite or add rules to create your own house style
 #
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`

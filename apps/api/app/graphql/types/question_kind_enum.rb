@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class QuestionKindEnum < Types::BaseEnum
     graphql_name "QuestionKind"

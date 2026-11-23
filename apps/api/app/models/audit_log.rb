@@ -1,3 +1,5 @@
+# typed: false
+
 # 監査ログ。足すだけで、変えない・消さない
 class AuditLog < ApplicationRecord
   belongs_to :clinic

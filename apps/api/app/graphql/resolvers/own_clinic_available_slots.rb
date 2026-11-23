@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class OwnClinicAvailableSlots < BaseResolver
     description "自院の、空いている診療枠。開始時刻の順（スタッフ用。医療機関は、ログインしている人の所属で決まる）"

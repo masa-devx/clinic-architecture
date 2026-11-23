@@ -1,3 +1,5 @@
+# typed: false
+
 # 受付できる時間の決まり。DB も時計も読まない（now は外から渡す）
 module Appointments
   module ConsultationRule

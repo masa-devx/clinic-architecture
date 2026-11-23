@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class UserErrorType < Types::BaseObject
     graphql_name "UserError"

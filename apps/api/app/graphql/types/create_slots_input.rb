@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class CreateSlotsInput < Types::BaseInputObject
     description "診療枠をまとめて作る入力。日付と時刻は日本時間"

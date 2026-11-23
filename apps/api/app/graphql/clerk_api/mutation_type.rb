@@ -1,3 +1,5 @@
+# typed: false
+
 module ClerkApi
   class MutationType < Types::BaseObject
     graphql_name "Mutation"

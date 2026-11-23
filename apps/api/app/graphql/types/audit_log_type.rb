@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class AuditLogType < Types::BaseObject
     graphql_name "AuditLog"

@@ -1,3 +1,5 @@
+# typed: false
+
 # 問診の答えを保存する。途中まで保存（submit: false）と、提出（submit: true）
 module Questionnaires
   class Save

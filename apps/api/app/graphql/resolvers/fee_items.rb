@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class FeeItems < BaseResolver
     description "自院の料金の表（事務スタッフだけ。ほかの人には空）"

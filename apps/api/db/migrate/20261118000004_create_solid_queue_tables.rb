@@ -1,3 +1,5 @@
+# typed: false
+
 # Solid Queue（ジョブ）の表。アプリと同じ DB に置く（DB を分けない）。
 # 中身は、solid_queue 1.7.2 の `bin/rails solid_queue:install` が作る db/queue_schema.rb を、マイグレーションに写したもの
 class CreateSolidQueueTables < ActiveRecord::Migration[8.1]

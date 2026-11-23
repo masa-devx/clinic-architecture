@@ -1,3 +1,5 @@
+# typed: false
+
 # 診療枠を、曜日・時間帯・1枠の長さ・期間から、まとめて作る
 module Slots
   class BulkCreate

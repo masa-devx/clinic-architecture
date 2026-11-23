@@ -1,3 +1,5 @@
+# typed: false
+
 # 会計を確定する（作成中 → 請求済）。合計を、このときの明細から決める。確定したあとは変えられない
 module Bills
   class Confirm

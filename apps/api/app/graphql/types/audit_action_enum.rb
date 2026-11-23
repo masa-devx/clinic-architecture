@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class AuditActionEnum < Types::BaseEnum
     graphql_name "AuditAction"

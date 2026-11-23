@@ -1,3 +1,5 @@
+# typed: false
+
 # 診察を終える。会計の下書きを、同じトランザクションで作る
 module Appointments
   class FinishConsultation

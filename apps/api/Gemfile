@@ -16,6 +16,9 @@ gem "solid_queue", "~> 1.7"
 # 起動を速くするキャッシュ（config/boot.rb で読む）
 gem "bootsnap", require: false
 
+# 型の注釈（sig）と、実行のときの型の確かめ。sig を書いたファイルが読むので、本番にも入れる
+gem "sorbet-runtime", "~> 0.6.13715"
+
 group :development, :test do
   gem "debug", platforms: %i[ mri ], require: "debug/prelude"
   gem "rubocop-rails-omakase", require: false
@@ -23,4 +26,8 @@ group :development, :test do
   gem "factory_bot_rails", "~> 6.5"
   # N+1 を見つける。テストでは、見つけたら例外にする
   gem "bullet", "~> 8.3"
+  # 型を調べる（srb tc）。本番では動かさない
+  gem "sorbet", "~> 0.6.13715", require: false
+  # gem と Rails（モデル・関連・enum など）の型（RBI）を作る
+  gem "tapioca", "~> 0.20.0", require: false
 end

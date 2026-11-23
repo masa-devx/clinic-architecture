@@ -1,3 +1,5 @@
+# typed: false
+
 # 送る通知を、outbox に入れる。予約の登録・キャンセルと同じトランザクションの中から呼ぶ
 module Notifications
   module Outbox

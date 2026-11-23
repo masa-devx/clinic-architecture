@@ -1,3 +1,5 @@
+# typed: false
+
 # 受付（チェックイン）。患者が、予約の時刻の前に「準備できた」と伝える
 module Appointments
   class CheckIn

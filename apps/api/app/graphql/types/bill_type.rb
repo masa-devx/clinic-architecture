@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class BillType < Types::BaseObject
     graphql_name "Bill"

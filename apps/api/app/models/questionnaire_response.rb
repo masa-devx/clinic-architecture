@@ -1,3 +1,5 @@
+# typed: false
+
 # 問診の答え（予約ごとに1つ）。中身は暗号にして持つ
 class QuestionnaireResponse < ApplicationRecord
   belongs_to :clinic

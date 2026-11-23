@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class Appointments < BaseResolver
     description "予約の一覧。患者は自分の予約、医師は自分が担当の予約、事務スタッフは自院の全部。枠の開始時刻の順"

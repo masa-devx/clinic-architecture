@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class CloseSlot < BaseMutation
     description "診療枠を閉じる（予約が入っていない枠だけ）"

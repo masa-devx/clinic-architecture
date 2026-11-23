@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class AuditLogs < BaseResolver
     description "監査ログ。新しい順。見られるのは、自院の分を、管理者の事務スタッフだけ（ほかの人には空）"

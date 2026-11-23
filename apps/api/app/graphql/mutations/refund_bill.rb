@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class RefundBill < BaseMutation
     description "会計を、返金済にする（全額）"

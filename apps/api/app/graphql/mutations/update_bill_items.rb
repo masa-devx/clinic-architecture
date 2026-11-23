@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class UpdateBillItems < BaseMutation
     description "会計の下書きの明細を、入れ直す"

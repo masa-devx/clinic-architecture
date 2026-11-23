@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 # 受付 → 診察の開始 → 診察の終了（会計の下書きができる）と、無断キャンセル

@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class StartConsultation < BaseMutation
     description "診察を始める"

@@ -1,3 +1,5 @@
+# typed: false
+
 # 業務の処理の結果。成功なら value、失敗なら errors（UserError の並び）を持つ
 class Result
   attr_reader :value, :errors

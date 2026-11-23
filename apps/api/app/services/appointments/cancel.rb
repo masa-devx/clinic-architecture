@@ -1,3 +1,5 @@
+# typed: false
+
 # 予約をキャンセルする。キャンセルした枠は、もう一度予約できるようになる
 module Appointments
   class Cancel

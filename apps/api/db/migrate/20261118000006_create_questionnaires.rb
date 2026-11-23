@@ -1,3 +1,5 @@
+# typed: false
+
 # 事前問診。質問は医療機関ごと。答えは予約ごとに1行で、中身をまるごと暗号にして持つ
 class CreateQuestionnaires < ActiveRecord::Migration[8.1]
   def change

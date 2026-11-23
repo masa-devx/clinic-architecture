@@ -1,3 +1,5 @@
+# typed: false
+
 # 診察を始める。担当の医師が、受付済の予約に対してだけできる
 module Appointments
   class StartConsultation

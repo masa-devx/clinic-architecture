@@ -1,3 +1,5 @@
+# typed: false
+
 # 曜日と時間帯から、診療枠の時刻の並びを作る。DB も時計も読まない
 module Slots
   module Schedule

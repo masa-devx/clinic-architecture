@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class Login < BaseMutation
     description "ログイン。この入口の利用者（患者・事務スタッフ・医師のどれか）としてだけ、ログインできる"

@@ -1,3 +1,5 @@
+# typed: false
+
 # カーソルで続きを読む Connection（前へは進まない。first・after だけ）
 #
 # graphql-ruby の標準は「何件目か」をカーソルにする（OFFSET）。それだと、深いページほど読み捨てる行が増え、

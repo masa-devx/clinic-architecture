@@ -1,3 +1,5 @@
+# typed: false
+
 # 患者。医療機関に属さず、複数の医療機関を予約できる
 class Patient < ApplicationRecord
   has_secure_password

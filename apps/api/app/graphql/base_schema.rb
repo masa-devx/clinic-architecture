@@ -1,3 +1,5 @@
+# typed: false
+
 # 3つの入口（患者・事務スタッフ・医師）のスキーマに共通の設定。
 # 入口ごとのスキーマ（PatientApi::Schema など）は、これを継いで、その人が使う query と mutation だけを載せる。
 # 型（Types::）・業務の処理（app/services）・認可（app/policies）は、入口をまたいで共有する

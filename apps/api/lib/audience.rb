@@ -1,3 +1,5 @@
+# typed: false
+
 # 利用者の種類。API の入口（GraphQL のスキーマ）と、画面のアプリは、この3つに分かれている
 #   patient: 患者 ／ clerk: 事務スタッフ ／ doctor: 医師
 module Audience

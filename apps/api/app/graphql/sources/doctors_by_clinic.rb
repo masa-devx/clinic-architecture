@@ -1,3 +1,5 @@
+# typed: false
+
 # 医療機関ごとの医師の一覧を、1回の SQL にまとめて読む
 module Sources
   class DoctorsByClinic < GraphQL::Dataloader::Source

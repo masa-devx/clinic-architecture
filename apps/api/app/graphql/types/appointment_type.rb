@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class AppointmentType < Types::BaseObject
     graphql_name "Appointment"

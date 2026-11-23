@@ -1,3 +1,5 @@
+# typed: false
+
 # 診療枠を閉じる。閉じられるのは、有効な予約が入っていない枠だけ
 module Slots
   class Close

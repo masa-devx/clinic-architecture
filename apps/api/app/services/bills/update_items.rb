@@ -1,3 +1,5 @@
+# typed: false
+
 # 会計の下書きの明細を、入れ直す（料金の表から選んだ項目と数量）
 module Bills
   class UpdateItems

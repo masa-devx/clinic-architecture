@@ -1,3 +1,5 @@
+# typed: false
+
 # 予約についての、患者へのメール。文は app/views/appointment_mailer/ にある
 class AppointmentMailer < ApplicationMailer
   before_action :load_appointment

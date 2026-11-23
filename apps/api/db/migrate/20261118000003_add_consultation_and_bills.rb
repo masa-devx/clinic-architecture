@@ -1,3 +1,5 @@
+# typed: false
+
 # 受付〜診察の日時と、会計（料金の表・会計・明細）
 class AddConsultationAndBills < ActiveRecord::Migration[8.1]
   def change

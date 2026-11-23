@@ -1,3 +1,5 @@
+# typed: false
+
 # 送る通知の記録（outbox）
 class OutboxMessage < ApplicationRecord
   belongs_to :appointment

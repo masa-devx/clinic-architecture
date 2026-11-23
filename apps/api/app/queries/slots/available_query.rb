@@ -1,3 +1,5 @@
+# typed: false
+
 # 空いている診療枠（これからの枠で、有効な予約が入っていないもの）
 module Slots
   class AvailableQuery

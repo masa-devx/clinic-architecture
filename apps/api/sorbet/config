@@ -1,0 +1,9 @@
+--dir
+.
+--ignore=/tmp/
+--ignore=/vendor/
+--ignore=/log/
+--ignore=/node_modules/
+--ignore=/storage/
+--ignore=/coverage/
+--parser=prism

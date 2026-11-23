@@ -1,3 +1,5 @@
+# typed: false
+
 # 問診の質問（医療機関ごと）
 class QuestionnaireQuestion < ApplicationRecord
   belongs_to :clinic

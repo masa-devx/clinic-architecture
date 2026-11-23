@@ -1,3 +1,5 @@
+# typed: false
+
 # GraphQL の入口。入口は、利用者の種類（患者・事務スタッフ・医師）ごとに3つあり、それぞれ別のスキーマを使う。
 # リクエストを受けて、その入口にログインしている人を決め、スキーマに渡す
 class GraphqlController < ApplicationController

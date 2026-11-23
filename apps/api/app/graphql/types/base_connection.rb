@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class BaseConnection < Types::BaseObject
     include GraphQL::Types::Relay::ConnectionBehaviors

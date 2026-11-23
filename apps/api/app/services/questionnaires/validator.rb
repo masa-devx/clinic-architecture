@@ -1,3 +1,5 @@
+# typed: false
+
 # 問診の答えを確かめる。DB も時計も読まない
 module Questionnaires
   module Validator

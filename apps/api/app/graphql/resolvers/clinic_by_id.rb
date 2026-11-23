@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class ClinicById < BaseResolver
     description "医療機関の1件。医療機関と医師の名前は、ログインしていれば誰でも見られる"

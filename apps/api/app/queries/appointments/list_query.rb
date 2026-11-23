@@ -1,3 +1,5 @@
+# typed: false
+
 # 予約の一覧。見られる予約（AppointmentPolicy.scope）を、枠の開始時刻の順で読む
 module Appointments
   class ListQuery

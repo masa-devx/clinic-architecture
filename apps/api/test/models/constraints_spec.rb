@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 # アプリのコードを通らない書き込みでも壊れてはいけないことを、DB の制約で守っているかを確かめる

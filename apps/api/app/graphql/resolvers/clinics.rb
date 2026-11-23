@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class Clinics < BaseResolver
     description "医療機関の一覧（患者が予約する先を選ぶ）。数が少ない前提で、上限つきの並びで返す"

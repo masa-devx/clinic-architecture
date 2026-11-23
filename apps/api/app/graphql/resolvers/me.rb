@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class Me < BaseResolver
     description "ログインしている人。ログインしていなければ null"

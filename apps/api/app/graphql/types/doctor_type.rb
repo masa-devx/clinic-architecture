@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class DoctorType < Types::BaseObject
     graphql_name "Doctor"

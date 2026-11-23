@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class BillItemInput < Types::BaseInputObject
     description "会計の明細の1行（料金の表の項目と、数量）"

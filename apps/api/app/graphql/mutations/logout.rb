@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class Logout < BaseMutation
     description "ログアウト。ログインしていなくても成功する"

@@ -1,3 +1,5 @@
+# typed: false
+
 # 開始から一定の時間たっても受付がない予約を、無断キャンセルにする（定期の処理から呼ぶ）
 module Appointments
   class MarkNoShows

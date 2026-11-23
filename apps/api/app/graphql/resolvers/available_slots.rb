@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class AvailableSlots < BaseResolver
     description "空いている診療枠。開始時刻の順"

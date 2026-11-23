@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class CreateSlots < BaseMutation
     description "診療枠をまとめて作る。すでにある枠・時間が重なる枠は飛ばす"

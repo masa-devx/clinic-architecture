@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class CheckIn < BaseMutation
     description "受付（チェックイン）をする"

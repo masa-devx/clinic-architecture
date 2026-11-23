@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class BookAppointmentForPatient < BaseMutation
     description "事務スタッフが、患者（メールアドレスで指定）の代わりに、自院の空いている診療枠へ予約を入れる"

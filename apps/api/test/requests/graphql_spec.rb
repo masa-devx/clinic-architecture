@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 # HTTP を通して確かめる（入口ごとのログイン・Cookie のセッション・Origin の確認）

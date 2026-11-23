@@ -1,3 +1,5 @@
+# typed: false
+
 module PatientApi
   class QueryType < Types::BaseObject
     graphql_name "Query"

@@ -1,3 +1,5 @@
+# typed: false
+
 # 会計。診察（予約）に対する請求。明細と合計を持つ
 class Bill < ApplicationRecord
   belongs_to :clinic

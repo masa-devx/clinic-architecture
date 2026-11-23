@@ -1,3 +1,5 @@
+# typed: false
+
 # ログインのセッション。患者かスタッフの、どちらか片方のもの
 class Session < ApplicationRecord
   belongs_to :patient, optional: true
