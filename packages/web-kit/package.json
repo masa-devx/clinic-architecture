@@ -7,6 +7,7 @@
     "./apollo": "./src/apollo.ts",
     "./providers": "./src/providers.tsx",
     "./app-shell": "./src/app-shell.tsx",
+    "./error-pages": "./src/error-pages.tsx",
     "./login-form": "./src/login-form.tsx",
     "./viewer-context": "./src/viewer-context.tsx",
     "./server": "./src/server.ts",
