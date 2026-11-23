@@ -49,8 +49,15 @@ jobs:
           bundler-cache: true
       - name: RuboCop
         run: bin/rubocop
+      # Sorbet の型を調べる。DB は要らない
+      - name: 型（Sorbet）
+        run: bundle exec srb tc
       - name: DB を作る
         run: bin/rails db:prepare
+      # モデル・関連・enum・ジョブ・ルートの RBI（sorbet/rbi/dsl）が、コミットしてあるものと同じか。
+      # 列の型を DB から読むので、DB を作ったあとに置く（テストの環境で作る。sorbet/tapioca/config.yml）
+      - name: Rails の RBI が古くないか
+        run: bin/tapioca dsl --verify
       # 書き出してある3つのスキーマ（schema/*.graphql）が今のスキーマと同じかは、RSpec（test/graphql/schema_spec.rb）が確かめる
       - name: RSpec
         run: bundle exec rspec
