@@ -51,7 +51,7 @@ jobs:
         run: bin/rubocop
       - name: DB を作る
         run: bin/rails db:prepare
-      # 書き出してある3つのスキーマ（schema/*.graphql）が今のスキーマと同じかは、RSpec（spec/graphql/schema_spec.rb）が確かめる
+      # 書き出してある3つのスキーマ（schema/*.graphql）が今のスキーマと同じかは、RSpec（test/graphql/schema_spec.rb）が確かめる
       - name: RSpec
         run: bundle exec rspec
 

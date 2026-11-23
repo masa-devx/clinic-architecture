@@ -16,6 +16,12 @@ module Api
     config.autoload_lib(ignore: %w[assets tasks])
     config.api_only = true
 
+    # テストは RSpec で書き、置き場所は test/（.rspec の --default-path）。ジェネレーターも test/ に作る
+    config.generators do |g|
+      g.test_framework :rspec
+      g.fixture_replacement :factory_bot, dir: "test/factories"
+    end
+
     # メールの宛先と本文（名前が入る）を、ログに出さない
     config.action_mailer.logger = nil
     config.action_mailer.delivery_method = :smtp
