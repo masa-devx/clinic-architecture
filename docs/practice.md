@@ -13,7 +13,9 @@ Rails のバックエンドの仕事の例と、ここでの練習の対応:
 | RDB の設計・運用、クエリとインデックスの最適化 | 100万件を入れて、実行計画を読み、インデックスを決める | E |
 | アーキテクチャ・開発プロセス・CI/CD の改善 | GitHub に置いて CI を通す。運用の道具を入れる。本番の形に置く | F |
 
-**主な目的は、Ruby on Rails と、それに付随するバックエンドの知識（DB・SQL・トランザクション・非同期処理・調査の道具）を理解すること**。画面だけの課題（C-3 など）は、後ろへ回す。道具は、無料で使えるものだけを使い、入れる前に「なぜ要るか」を決める（[pm](../agents/skills/pm/SKILL.md) の5つの問い）。
+**主な目的は、Ruby on Rails と、それに付随するバックエンドの知識（DB・SQL・トランザクション・非同期処理・調査の道具）を理解すること**。画面だけの課題（C-3 など）は、後ろへ回す。道具は、無料で使えるものだけを使い、入れる前に「なぜ要るか」を決める（[pdm](../agents/skills/pdm/SKILL.md) の5つの問い）。
+
+もう1つの目的は、**面接で「どんな問題を、なぜその技術で、ほかと比べて何を捨てて解いたか」を語れるようになること**。そのために、架空の会社（[company.md](company.md)）の現場を想定し、PdM とプロジェクトリーダーの役（下の2章）と一緒に進める。
 
 ## 1. 今ある土台（template の中身）
 
@@ -61,13 +63,18 @@ Rails のバックエンドでよく使われる構成と、ここの構成は�
 | 監視 | Sentry・Datadog・CloudWatch | なし（1行の JSON のログだけ） | C-1 |
 | インフラ | ECS Fargate・ALB・Terraform | 手元の Docker だけ | F-4 |
 
-## 2. 進め方（1つの課題 = 1つのブランチ）
+## 2. 進め方（現場の流れ。1つの依頼 = 1つの Issue = 1つのブランチ）
 
-1. `git switch template && git switch -c practice/<記号>-<名前>` で切る
-2. **先に、自分で考える**: 何が問題か・どう調べるか・どう直すかを、`docs/steps/` に短く書く（[explain-step](../agents/skills/explain-step/SKILL.md) の6つの問い）
-3. 調べる・直す。AI に書かせてもよいが、説明できない所を残さない
-4. 記録する: 判断は [decisions.md](decisions.md)、課題と数字は [improvements/](improvements/README.md)
-5. PR を作って、自分でレビューの観点を書く（F-1 のあと）
+| # | 誰と | すること | 残すもの |
+| --- | --- | --- | --- |
+| 1 | PdM（[pdm](../agents/skills/pdm/SKILL.md)） | 関係者の声を聞き、聞き返して、困りごとを掘る。事実と仮説を分ける | — |
+| 2 | PdM | Issue にする。**成功の数字とやめる基準を、作る前に**決める | Issue |
+| 3 | プロジェクトリーダー（[tech-lead](../agents/skills/tech-lead/SKILL.md)） | 見積もりを自分で先に出す。半日の歩幅に分ける。リスクを挙げる | — |
+| 4 | プロジェクトリーダー | 手を動かす前に、質問で理解を確かめる。技術の案を「何もしない」を含めて比べる | `docs/steps/`・[decisions.md](decisions.md) |
+| 5 | 自分 | `git switch template && git switch -c practice/<記号>-<名前>` で切り、調べる・直す。AI に書かせてもよいが、説明できない所を残さない | テスト・[improvements/](improvements/README.md) の数字 |
+| 6 | プロジェクトリーダー | PR を見る（テンプレートの欄・3つの問い） | PR |
+| 7 | PdM | 受け入れる。成功の数字を見る。関係者に「困りごとはどうなった？」と聞かれる | — |
+| 8 | プロジェクトリーダー（面接官の役） | 語れる記録を書き、深掘りされて直す | [stories/](stories/README.md) |
 
 C の課題（不具合の調査）は、**AI に「不具合を仕込んだブランチ」を作らせて、何を仕込んだかは教えてもらわずに調べる**。「原因が分からない所から始める」調査に近づける。
 
@@ -84,6 +91,7 @@ C の課題（不具合の調査）は、**AI に「不具合を仕込んだブ�
 | F-3 | 運用の道具を入れる | strong_migrations・Renovate・（画面は）Storybook。入れる前に「何を止めるか」を1つずつ言えるようにする | 止めた例 |
 | F-4 | 本番の形に置く | Terraform で ECS Fargate・ALB・RDS。秘密の値は Parameter Store。確かめたら壊す | 構成の図・かかったお金 |
 | F-5 | CI を速くする | どこに時間がかかっているかを測ってから、キャッシュ・並列を入れる | CI の時間（前 → 後） |
+| F-6 | 現場を想定して進める仕組み（2026-11-23 に済み） | 架空の会社（[company.md](company.md)）・PdM（[pdm](../agents/skills/pdm/SKILL.md)）とプロジェクトリーダー（[tech-lead](../agents/skills/tech-lead/SKILL.md)）の役・語れる記録（[stories/](stories/README.md)）を用意する | — |
 
 ### E. DB の設計とクエリ
 
