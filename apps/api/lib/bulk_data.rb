@@ -10,8 +10,10 @@ class BulkData
   EMAIL_DOMAIN = "bulk.example"
   # 1枠は30分。9:00〜17:00 に16枠
   SLOTS_PER_DAY = 16
-  # 今日から先に、何日分の枠を作るか（残りは過去の枠）。件数が少なくて日数が短いときは、全体の4分の1まで
+  # 今日から先に、何日分の枠を作るか（残りは過去の枠）。件数が少なくて日数が短いときは、全体の4分の1まで。
+  # ただし、今日と明日の2日は必ず作る（今日だけだと、夕方に流したとき、今日の枠がすべて過去になり、先の予約が1件もできない）
   FUTURE_DAYS = 30
+  MIN_FUTURE_DAYS = 2
   # 枠の何割に予約が入っているか（id の下1桁が0の枠は、空きのまま）
   BOOKED_SHARE = 0.9
   # 手元だけの捨ててよい値（初期データと同じ）
@@ -147,7 +149,7 @@ class BulkData
     doctors = (@clinics - 1) * @doctors_per_clinic + @doctors_in_big_clinic
     slots_per_doctor = (@appointments / BOOKED_SHARE / doctors).ceil
     days = (slots_per_doctor.to_f / SLOTS_PER_DAY).ceil
-    future_days = [ FUTURE_DAYS, days / 4 ].min
+    future_days = (days / 4).clamp(MIN_FUTURE_DAYS, FUTURE_DAYS)
     first_day = future_days - days
     last_day = future_days - 1
     execute(<<~SQL)
