@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class SaveQuestionnaire < BaseMutation
     description "問診の答えを保存する。submit が false なら途中まで保存、true なら提出（必須の質問を確かめる）"

@@ -344,3 +344,24 @@
 - 理由: Apollo Client を使い続けるので、Apollo がすすめる形に寄せると、Apollo の機能（data masking・`useFragment`）とドキュメントがそのまま使える。data masking は、型だけでなく実行のときも隠すので、親の部品が子の項目に頼る書き方（D-010 の「行に要る項目は、行を描く部品の隣の fragment で決める」を破る書き方）が、型と画面の両方で止まる。実際に、医師の問診の画面が子の fragment を読んでいたのが見つかった
 - 弱点・やめる条件: `.generated.ts` が `.graphql` の隣に増え、PR の差分に生成物が混ざる（整形と ESLint からは外している）。`useFragment` は Apollo Client のキャッシュから読むので、子の部品（`〜View` でないほう）を描くには Apollo Client が要る。Storybook を入れるときは `〜View` を載せる。`typescript-operations` 7.0.2 は、入れた日の前日に出たばかりの版。生成物がおかしくなったら、7.0.1 に戻して比べる。codegen を使わない形（gql.tada など）は、比べていない
 - 確かめた数字: Vitest の件数は、前と後で同じ（web-kit 15・患者 10・事務スタッフ 15・医師 7）。`pnpm codegen` を2回流して、20の生成物が同じになることを確かめた。E2E は CI で確かめる（手元では流していない）
+
+## D-021. Ruby に Sorbet を入れ、業務の処理・集計・lib を `typed: true` にする
+
+- 日付: 2026-11-23 ／ 課題: F-11 ／ 状態: 決定（[roadmap.md](roadmap.md) の「Sorbet は入れない」を、この課題で変えた）
+- 困ったこと: バックエンドの引数と戻り値の形は、コメント（「キャンセルできるなら nil、できないなら UserError を返す」など）とテストでしか分からなかった。業務の処理（`app/services`）は `now:`・`actor:`・ID を受け取る形がそろっているが、`now:` に `Time.current`（`ActiveSupport::TimeWithZone`）でなく `Time.now`（`Time`）を渡しても、テストのない道では気づけない。画面の側は、スキーマから作った型で止まるのに、Rails の中は止まらない
+- 比べた案:
+  - 案A: **入れない**（今のまま。RSpec とコメントで守る）: 道具も生成物も増えない ／ 形の食い違いは、テストを書いた道でしか見つからない。コメントと実装がずれても気づけない
+  - 案B: **RBS（＋Steep）**: Ruby の標準の型の書き方（`.rbs` を別のファイルに書く）。Ruby 本体と rbs gem が持っている ／ 型をコードと別のファイルに書くので、メソッドを変えたときに写し忘れる。Rails のモデル・関連・enum の型は rbs_rails で作れるが、graphql-ruby・Solid Queue などの型は自分で足す量が多い。実行のときの確かめはない
+  - 案C: **Sorbet＋tapioca**: 型（`sig`）をメソッドのすぐ上に書く。tapioca が、gem と Rails（モデル・関連・enum・ジョブ・ルート）の型（RBI）を作る。sorbet-runtime が、実行のときにも引数と戻り値を確かめる ／ 生成物（`sorbet/rbi/`）が大きい（13MB・364k 行）。gem や Rails の型は、作り直しを忘れると古くなる。Ruby の標準の書き方ではない
+- 選んだもの: 案C
+  - 版: `sorbet`・`sorbet-runtime` 0.6.13715、`tapioca` 0.20.0（どれも入れた日の最新）。`sorbet-runtime` はふつうの依存（`sig` を書いたファイルが本番でも読む）、`sorbet` と `tapioca` は development・test だけ。tapioca が使う `rbi` が prism 1 系を求めるので、prism を 2.1.0 から 1.9.0 に下げた
+  - 段階: まず、どのファイルも `# typed: false`（sigil を付けるだけ）で `srb tc` を通した。そのあと、業務の処理（`app/services`）・集計（`app/queries`）・`lib` の 34 ファイルを `typed: true` に上げ、公開しているメソッドに `sig` を書いた。モデル・GraphQL の型と resolver・ポリシー・テストは `typed: false` のまま（158 ファイル）
+  - 型の決め方: `now:` は `ActiveSupport::TimeWithZone`（アプリもテストも `Time.current`・`Time.zone.local` を渡す）。`actor:` は `T.any(Patient, StaffMember)`。ID は `T.any(Integer, String)`（GraphQL の ID は文字、テストは数を渡す）。Relation を返すメソッドは `ActiveRecord::Relation`（tapioca の `Appointment::PrivateRelation` は RBI の中にしかなく、実行のときに読めない）
+  - **`module_function` をやめ、`def self.` にした**: `module_function` のメソッドに `sig` を書いても、`Audience.of(...)` のようにモジュールから呼んだときは、sorbet-runtime が型を確かめなかった（`ConsultationRule.no_show_cutoff(Time.now)` が通った）。モジュールの側の写しが、`sig` の包みの外にあるため。`def self.` にすると例外になる
+  - `T.unsafe`・`T.untyped` は、理由を1行のコメントで書いた所だけ: `authenticate_by` を Relation から呼ぶ所（Rails の委譲で、Relation の型に出ない）、`Result#value`（処理ごとに中身が違う）、`KeysetConnection` の `**options`（graphql-ruby にそのまま渡す）
+  - 実行のときの確かめは、既定のまま（違反は例外）。DSL の RBI は、テストの環境で作る（`sorbet/tapioca/config.yml`。CI はテストの DB しか作らない。開発の環境だけのルートは型に入れない）。CI（`CI=true` で eager_load あり）でだけ読み込まれる Rails の中のコントローラー（`Rails::HealthController` など）は `skip_constant` で外した。外さないと、手元と CI で作る RBI が変わり、`--verify` が CI でだけ落ちた（手元で `CI=true` を付けて流して見つけた）
+  - CI（API のジョブ）: DB を作ったあとに `bundle exec srb tc` と `bin/tapioca dsl --verify`。RuboCop は `sorbet/` を調べない
+- 理由: 業務の処理は「何を受け取り、何を返すか」がこの題材の設計の中心で、そこをメソッドの隣で型として読めるようにしたい。Sorbet は `sig` がコードの隣にあるので、メソッドを変えると型も一緒に直す（RBS のように別のファイルに写さない）。tapioca が Rails と gem の型を作るので、モデルの列や関連を手で書かずに済む。sorbet-runtime が実行のときにも確かめるので、`typed: false` のファイル（GraphQL の入口）から来る値の食い違いも、テストで例外として見つかる
+- 弱点・やめる条件: 生成物が大きく、gem を上げるたびに `bin/tapioca gem`、モデル・ルートを変えるたびに `bin/tapioca dsl` を流す（DSL は CI で古いと落ちる。gem の RBI は CI で確かめていない）。`typed: false` のファイル（GraphQL・ポリシー・モデル）から呼ぶ所は、静的には型が付かず、実行のときの確かめだけで守っている。sorbet-runtime は、`sig` のあるメソッドを呼ぶたびに少し遅くなる（測っていない）。Rails や graphql-ruby の新しい版で tapioca の対応が遅れたら、その間は `bin/tapioca dsl` が通らないことがある。型を書く負担のほうが大きいと感じたら、`typed: true` の範囲を広げずに止める。roadmap の「Ruby の型まで広げると焦点がぼける」は、範囲を3つのフォルダに絞ることで抑えている
+- 生成物の扱い（2026-11-23 に追記）: RBI は約 13MB（gem の分 11MB・Rails の分 1.8MB）。比べた案は、gem の分をコミットせず手元と CI で作る（リポジトリは軽くなる ／ 最初に作る手間・CI のキャッシュが要る）、RBS＋Steep に替える（gem の型を取ってくるだけでよい ／ 今の sig の書き直し）。**コミットしたまま、`.gitattributes` の `linguist-generated` で PR の差分では畳む**形にした。手元と CI が同じ型を、作り直しなしで使え、いちばん多い使い方でもあるため。画面の codegen の生成物と、書き出した GraphQL のスキーマにも同じ印を付けた
+- 確かめた数字（手元の Docker、2026-11-23）: `srb tc` は 0.5 秒・エラー 0。`bin/tapioca dsl --verify` は 4 秒。RSpec 235 件が通った（eager_load ありの `CI=true` でも同じ）。sig を書いて見つかった食い違いは、どれも本番の不具合ではなかった: 会計の予約（`bill.appointment`）の型が nil を含む（DB では NOT NULL。`T.must` で読む）、監査ログのテストが `Audit.record` の subject に監査ログそのものを渡していた（予約に替えた）

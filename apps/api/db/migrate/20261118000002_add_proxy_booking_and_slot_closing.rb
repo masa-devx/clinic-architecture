@@ -1,3 +1,5 @@
+# typed: false
+
 # 事務スタッフの代理の予約（誰が入れたかを残す）と、診療枠を閉じる
 class AddProxyBookingAndSlotClosing < ActiveRecord::Migration[8.1]
   def change

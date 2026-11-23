@@ -1,3 +1,5 @@
+# typed: false
+
 # N+1 の検知。開発ではログに出し、テストでは例外にして落とす
 if defined?(Bullet) && (Rails.env.development? || Rails.env.test?)
   Rails.application.config.after_initialize do

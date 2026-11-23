@@ -1,3 +1,5 @@
+# typed: false
+
 # 監査ログ。誰が・いつ・どの患者の・何を見たか、変えたか。足すだけで、変えない・消さない
 class CreateAuditLogs < ActiveRecord::Migration[8.1]
   def change

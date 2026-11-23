@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 # 計測用の大量のデータ（bin/rails bulk:load）を、小さい件数で入れて確かめる。

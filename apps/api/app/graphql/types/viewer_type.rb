@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class ViewerType < Types::BaseObject
     graphql_name "Viewer"

@@ -1,3 +1,5 @@
+# typed: false
+
 # 会計の認可。要件の4章の表を、ここだけに書く
 class BillPolicy
   # 見られる会計だけに絞った relation。

@@ -1,3 +1,5 @@
+# typed: false
+
 module GraphqlHelper
   # スキーマを通して実行する（HTTP は通さない）。想定していないエラーが出たら、その場で落とす。
   # 入口（スキーマ）は、user の種類で決まる。ログインしていない場合などは、audience で指定する

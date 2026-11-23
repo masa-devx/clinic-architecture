@@ -1,3 +1,5 @@
+# typed: false
+
 # resolver と mutation の入口で、ログインを確かめる。ログインが要らないものだけ、allow_guest! と書く
 module Authentication
   def self.included(base)

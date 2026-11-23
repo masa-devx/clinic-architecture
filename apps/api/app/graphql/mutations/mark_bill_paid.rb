@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class MarkBillPaid < BaseMutation
     description "会計を、支払い済にする（窓口で受け取ったことを記録する）"

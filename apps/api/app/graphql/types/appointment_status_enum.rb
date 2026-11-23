@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class AppointmentStatusEnum < Types::BaseEnum
     graphql_name "AppointmentStatus"

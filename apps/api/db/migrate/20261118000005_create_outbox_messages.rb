@@ -1,3 +1,5 @@
+# typed: false
+
 # 送る通知の記録（outbox）。予約の登録・キャンセルと同じトランザクションで入れて、あとからジョブが送る。
 # 「予約は入ったのに、メールが出ない」を起こさないため
 class CreateOutboxMessages < ActiveRecord::Migration[8.1]

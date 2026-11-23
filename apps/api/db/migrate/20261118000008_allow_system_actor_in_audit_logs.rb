@@ -1,3 +1,5 @@
+# typed: false
+
 # 監査ログの「した人」に、システム（定期の処理）を足す。無断キャンセルにする処理も、患者の予約を変えるので、残す
 class AllowSystemActorInAuditLogs < ActiveRecord::Migration[8.1]
   def change

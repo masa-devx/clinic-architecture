@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class FeeItemType < Types::BaseObject
     graphql_name "FeeItem"

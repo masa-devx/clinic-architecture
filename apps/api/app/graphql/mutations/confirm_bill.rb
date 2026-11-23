@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class ConfirmBill < BaseMutation
     description "会計を確定する。確定したあとは、明細を変えられない"

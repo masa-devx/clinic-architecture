@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class FinishConsultation < BaseMutation
     description "診察を終える。会計の下書きができる"

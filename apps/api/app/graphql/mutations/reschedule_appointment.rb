@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class RescheduleAppointment < BaseMutation
     description "予約の時刻を変える（同じ医療機関の、空いている枠へ付け替える）"

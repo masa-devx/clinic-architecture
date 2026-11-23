@@ -1,7 +1,12 @@
+# typed: true
+
 # 問診の答えを保存する。途中まで保存（submit: false）と、提出（submit: true）
 module Questionnaires
   class Save
+    extend T::Sig
+
     # answers は { 質問の id（文字）=> 値 }
+    sig { params(actor: T.any(Patient, StaffMember), appointment_id: T.any(Integer, String), answers: T::Hash[String, Validator::Answer], submit: T::Boolean, now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, appointment_id:, answers:, submit:, now:)
       @actor = actor
       @appointment_id = appointment_id
@@ -10,6 +15,7 @@ module Questionnaires
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       QuestionnaireResponse.transaction do
         # 予約の行をロックして読む。「診察が始まる前」と確かめたあとに、診察が始まる（StartConsultation の更新）を待たせる。

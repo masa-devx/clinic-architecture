@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class QuestionnaireAnswerType < Types::BaseObject
     graphql_name "QuestionnaireAnswer"

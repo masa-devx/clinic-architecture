@@ -1,6 +1,11 @@
+# typed: true
+
 # 空いている診療枠（これからの枠で、有効な予約が入っていないもの）
 module Slots
   class AvailableQuery
+    extend T::Sig
+
+    sig { params(clinic_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone, doctor_id: T.nilable(T.any(Integer, String)), from: T.nilable(Date), to: T.nilable(Date)).void }
     def initialize(clinic_id:, now:, doctor_id: nil, from: nil, to: nil)
       @clinic_id = clinic_id
       @now = now
@@ -9,6 +14,7 @@ module Slots
       @to = to
     end
 
+    sig { returns(ActiveRecord::Relation) }
     def relation
       relation = Slot.where(clinic_id: @clinic_id, closed_at: nil).where("slots.starts_at > ?", @now)
       relation = relation.where(doctor_id: @doctor_id) if @doctor_id
@@ -24,6 +30,7 @@ module Slots
     end
 
     # Pagination::KeysetConnection に渡す並びのキー（開始時刻 → id）
+    sig { returns(T::Array[Pagination::KeysetConnection::Key]) }
     def keys
       [
         { sql: "slots.starts_at", cast: "timestamptz", value: ->(slot) { slot.starts_at.utc.iso8601(6) } },

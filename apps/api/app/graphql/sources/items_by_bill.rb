@@ -1,3 +1,5 @@
+# typed: false
+
 # 会計ごとの明細を、1回の SQL にまとめて読む
 module Sources
   class ItemsByBill < GraphQL::Dataloader::Source

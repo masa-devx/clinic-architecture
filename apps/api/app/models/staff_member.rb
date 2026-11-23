@@ -1,3 +1,5 @@
+# typed: false
+
 # 医師と事務スタッフ。1つの医療機関に属する
 class StaffMember < ApplicationRecord
   has_secure_password

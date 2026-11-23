@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "ダッシュボード（日ごと・医師ごとの集計）" do

@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class ViewerKindEnum < Types::BaseEnum
     graphql_name "ViewerKind"

@@ -1,3 +1,5 @@
+# typed: false
+
 # 予約ごとの問診を、1回の SQL にまとめて読む。見せてよいかは、呼ぶ側（AppointmentType）が確かめる
 module Sources
   class QuestionnaireByAppointment < GraphQL::Dataloader::Source

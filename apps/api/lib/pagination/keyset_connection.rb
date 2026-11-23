@@ -1,3 +1,5 @@
+# typed: true
+
 # カーソルで続きを読む Connection（前へは進まない。first・after だけ）
 #
 # graphql-ruby の標準は「何件目か」をカーソルにする（OFFSET）。それだと、深いページほど読み捨てる行が増え、
@@ -11,25 +13,36 @@
 #   ])
 module Pagination
   class KeysetConnection < GraphQL::Pagination::Connection
+    extend T::Sig
+
+    # 並びのキーの1つ。value は、行（予約・枠・監査ログなど）から、カーソルに入れる値を取り出す
+    Key = T.type_alias { { sql: String, cast: String, value: T.proc.params(record: ActiveRecord::Base).returns(T.any(String, Integer)) } }
+
+    # options は、graphql-ruby の Connection にそのまま渡す（first・after など。graphql-ruby が型を持たないので、型を決めない）
+    sig { params(relation: ActiveRecord::Relation, keys: T::Array[Key], descending: T::Boolean, options: T.untyped).void }
     def initialize(relation, keys:, descending: false, **options)
       super(relation, **options)
       @keys = keys
       @descending = descending
     end
 
+    sig { returns(T::Array[ActiveRecord::Base]) }
     def nodes
       load_page
       @nodes
     end
 
+    sig { returns(T::Boolean) }
     def has_next_page
       load_page
       @has_next_page
     end
 
     # 前へは進まないので、前のページは「after があるか」だけで答える
+    sig { returns(T::Boolean) }
     def has_previous_page = after_value.present?
 
+    sig { params(record: ActiveRecord::Base).returns(String) }
     def cursor_for(record)
       encode(JSON.generate(@keys.map { |key| key[:value].call(record) }))
     end

@@ -1,12 +1,18 @@
+# typed: true
+
 # 診療枠を閉じる。閉じられるのは、有効な予約が入っていない枠だけ
 module Slots
   class Close
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), slot_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, slot_id:, now:)
       @actor = actor
       @slot_id = slot_id
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       return Result.error("NOT_PERMITTED", "診療枠を閉じられるのは、医師と事務スタッフだけです") unless @actor.is_a?(StaffMember)
 

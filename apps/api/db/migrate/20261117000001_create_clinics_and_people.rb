@@ -1,3 +1,5 @@
+# typed: false
+
 # 医療機関（テナント）と、ログインする人（患者・スタッフ）
 class CreateClinicsAndPeople < ActiveRecord::Migration[8.1]
   def change

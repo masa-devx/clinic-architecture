@@ -1,12 +1,18 @@
+# typed: true
+
 # 予約をキャンセルする。キャンセルした枠は、もう一度予約できるようになる
 module Appointments
   class Cancel
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), appointment_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, appointment_id:, now:)
       @actor = actor
       @appointment_id = appointment_id
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       # 見られる予約の中から探す。ほかの医療機関・ほかの患者の予約は、あっても「見つからない」
       appointment = AppointmentPolicy.scope(@actor).includes(:slot).find_by(id: @appointment_id)

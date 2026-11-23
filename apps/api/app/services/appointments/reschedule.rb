@@ -1,9 +1,14 @@
+# typed: true
+
 # 予約の時刻を変える。状態は変えず、枠だけを付け替える（予約済のときだけ）
 #
 # 「新しい枠を押さえる」と「前の枠を空ける」は、1つの UPDATE（slot_id の付け替え）で同時に起きる。
 # 片方だけ成功することはない。新しい枠が埋まっていれば、UNIQUE に当たって、前の枠のまま残る
 module Appointments
   class Reschedule
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), appointment_id: T.any(Integer, String), slot_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, appointment_id:, slot_id:, now:)
       @actor = actor
       @appointment_id = appointment_id
@@ -11,6 +16,7 @@ module Appointments
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       Appointment.transaction do
         appointment = AppointmentPolicy.scope(@actor).includes(:slot).find_by(id: @appointment_id)

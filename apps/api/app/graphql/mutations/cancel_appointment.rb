@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class CancelAppointment < BaseMutation
     description "予約をキャンセルする"

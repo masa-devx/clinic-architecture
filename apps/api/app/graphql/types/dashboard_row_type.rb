@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class DashboardRowType < Types::BaseObject
     graphql_name "DashboardRow"

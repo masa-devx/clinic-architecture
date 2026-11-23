@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class AppointmentFilterInput < Types::BaseInputObject
     graphql_name "AppointmentFilter"

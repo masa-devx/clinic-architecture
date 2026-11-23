@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class AppointmentById < BaseResolver
     description "予約の1件。見られない予約は null"

@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class BillStatusEnum < Types::BaseEnum
     graphql_name "BillStatus"

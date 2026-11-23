@@ -1,7 +1,12 @@
+# typed: true
+
 # 予約する。同じ枠に同時に来ても、成功するのは1件だけ
 # 患者は自分の予約を入れる。事務スタッフは、自院の枠に、患者（メールアドレスで指定）の代わりに入れる
 module Appointments
   class Book
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), slot_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone, patient_email: T.nilable(String)).void }
     def initialize(actor:, slot_id:, now:, patient_email: nil)
       @actor = actor
       @slot_id = slot_id
@@ -9,6 +14,7 @@ module Appointments
       @patient_email = patient_email
     end
 
+    sig { returns(Result) }
     def call
       Appointment.transaction do
         # 枠の行を、共有のロックで読む。同時に予約する人どうしは待たないが、枠を閉じる処理（FOR UPDATE）とは待ち合う。

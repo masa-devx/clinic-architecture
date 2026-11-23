@@ -1,3 +1,5 @@
+# typed: false
+
 # ログインのセッション。Cookie には合言葉（トークン）だけを入れ、誰のセッションかは、この表が持つ。
 # ログアウトで行を消すと、控えておいた Cookie の値も、その場で使えなくなる
 class CreateSessions < ActiveRecord::Migration[8.1]

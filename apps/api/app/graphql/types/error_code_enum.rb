@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class ErrorCodeEnum < Types::BaseEnum
     graphql_name "ErrorCode"

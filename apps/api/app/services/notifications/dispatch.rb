@@ -1,3 +1,5 @@
+# typed: true
+
 # outbox の、まだ送っていない通知を送る（定期の処理から呼ぶ）
 #
 # 1. 短いトランザクションで、送る行を「取る」（locked_until を先の時刻にする。ほかの係とは SKIP LOCKED でぶつからない）
@@ -8,16 +10,20 @@
 # 「1回も送られない」より「まれに2回送られる」を選んでいる（少なくとも1回）
 module Notifications
   class Dispatch
+    extend T::Sig
+
     BATCH_SIZE = 50
     LOCK_FOR = 5.minutes
     MAX_ATTEMPTS = 5
 
+    sig { params(now: ActiveSupport::TimeWithZone, batch_size: Integer).void }
     def initialize(now:, batch_size: BATCH_SIZE)
       @now = now
       @batch_size = batch_size
     end
 
     # 送った件数を返す
+    sig { returns(Integer) }
     def call
       claim.count { |message| deliver(message) }
     end

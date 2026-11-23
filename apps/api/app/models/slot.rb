@@ -1,3 +1,5 @@
+# typed: false
+
 # 診療枠。医師 × 開始時刻 × 終了時刻。定員は1人
 class Slot < ApplicationRecord
   belongs_to :clinic

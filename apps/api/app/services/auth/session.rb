@@ -1,3 +1,5 @@
+# typed: true
+
 # ログインのセッション。Cookie には合言葉（トークン）だけを入れ、誰のセッションかは DB（sessions）が持つ。
 # Cookie のキーとトークンの扱いは、ここだけが知る
 #
@@ -6,14 +8,18 @@
 # 同じブラウザで、患者と医師の両方にログインしていても、互いを上書きしない
 module Auth
   class Session
+    extend T::Sig
+
     LIFETIME = 12.hours
 
+    sig { params(request: ActionDispatch::Request, audience: String, now: ActiveSupport::TimeWithZone).void }
     def initialize(request, audience:, now:)
       @request = request
       @audience = audience
       @now = now
     end
 
+    sig { returns(T.nilable(T.any(Patient, StaffMember))) }
     def current_user
       return nil if token.blank?
 
@@ -22,6 +28,7 @@ module Auth
       user if Audience.of(user) == @audience
     end
 
+    sig { params(user: T.any(Patient, StaffMember)).void }
     def sign_in(user)
       # ログインのたびに、合言葉を作り直す（前の合言葉は、その場で使えなくなる）
       sign_out
@@ -32,6 +39,7 @@ module Auth
     end
 
     # 行を消すので、控えておいた Cookie の値も、その場で使えなくなる。ほかの入口のログインは、そのまま
+    sig { void }
     def sign_out
       ::Session.where(token_digest: digest(token)).delete_all if token.present?
       @request.session.delete(key)

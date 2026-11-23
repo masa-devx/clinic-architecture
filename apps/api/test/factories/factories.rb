@@ -1,3 +1,5 @@
+# typed: false
+
 FactoryBot.define do
   factory :clinic do
     sequence(:name) { |n| "テスト医療機関#{n}" }

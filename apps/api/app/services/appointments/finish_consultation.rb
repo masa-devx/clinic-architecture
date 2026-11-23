@@ -1,12 +1,18 @@
+# typed: true
+
 # 診察を終える。会計の下書きを、同じトランザクションで作る
 module Appointments
   class FinishConsultation
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), appointment_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, appointment_id:, now:)
       @actor = actor
       @appointment_id = appointment_id
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       appointment = AppointmentPolicy.scope(@actor).find_by(id: @appointment_id)
       return Result.error("NOT_FOUND", "予約が見つかりません", field: "appointmentId") unless appointment

@@ -1,3 +1,5 @@
+# typed: false
+
 module Mutations
   class BookAppointment < BaseMutation
     description "空いている診療枠を予約する"

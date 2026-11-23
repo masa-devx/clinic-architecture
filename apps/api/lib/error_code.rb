@@ -1,3 +1,5 @@
+# typed: true
+
 # エラーのコードの一覧（ここだけで決める）。GraphQL の enum と、画面の出し分けは、ここから作る
 module ErrorCode
   # 使う人が直せるエラー。mutation の結果の errors に、コードと項目つきで入れる

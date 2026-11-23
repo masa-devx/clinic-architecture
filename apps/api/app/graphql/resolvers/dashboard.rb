@@ -1,3 +1,5 @@
+# typed: false
+
 module Resolvers
   class Dashboard < BaseResolver
     description "日ごと・医師ごとの集計。見られるのは、自院の分を、事務スタッフだけ（ほかの人には空）。期間は31日まで"

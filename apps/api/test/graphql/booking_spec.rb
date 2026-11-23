@@ -1,3 +1,5 @@
+# typed: false
+
 require "rails_helper"
 
 RSpec.describe "予約とキャンセル（bookAppointment・cancelAppointment）" do

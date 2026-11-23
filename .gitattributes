@@ -1,0 +1,9 @@
+# 自動で作るファイル。GitHub の PR の差分では畳んで出し、言語の割合にも数えない（判断は docs/decisions.md の D-021）
+# Sorbet の型の定義（tapioca が作る。gem の分・Rails の分・補足）
+apps/api/sorbet/rbi/gems/** linguist-generated=true
+apps/api/sorbet/rbi/dsl/** linguist-generated=true
+apps/api/sorbet/rbi/annotations/** linguist-generated=true
+# GraphQL のスキーマ（Rails が書き出す）と、画面の型（GraphQL Code Generator が作る）
+apps/api/schema/*.graphql linguist-generated=true
+apps/*/types/__generated__/** linguist-generated=true
+apps/**/*.generated.ts linguist-generated=true

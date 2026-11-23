@@ -1,3 +1,5 @@
+# typed: false
+
 # 診療枠の認可。要件の4章の表を、ここだけに書く
 class SlotPolicy
   def initialize(user)

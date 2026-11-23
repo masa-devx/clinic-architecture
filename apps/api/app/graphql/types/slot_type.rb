@@ -1,3 +1,5 @@
+# typed: false
+
 module Types
   class SlotType < Types::BaseObject
     graphql_name "Slot"

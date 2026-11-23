@@ -1,3 +1,5 @@
+# typed: false
+
 # 予約（患者が診療枠を1つ押さえたもの）
 class CreateAppointments < ActiveRecord::Migration[8.1]
   def change
