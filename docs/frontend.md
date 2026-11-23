@@ -9,8 +9,8 @@ Next.js（App Router）＋Chakra UI＋Apollo Client。進め方は [roadmap.md](
 ```mermaid
 flowchart TB
     A["app/<br>URL と画面の対応・レイアウト・ログインの確認・最初のデータの取り始め"]
-    F["features/予約・一覧・会計 など<br>その機能の部品・fragment・mutation・フック・テスト"]
-    S["shared<br>packages/ui（見た目の部品とテーマ）・lib（Apollo の設定・認証・日付・エラー）・生成した型"]
+    F["features/予約・一覧・会計 など<br>その機能の部品（components/）・クエリと fragment（graphql/）・計算と変換"]
+    S["shared<br>packages/ui（見た目の部品とテーマ）・packages/web-kit（Apollo の設定・日付・エラー）・lib（ログインの確認）・生成した型（types/）"]
     A --> F --> S
     A --> S
 ```
@@ -19,9 +19,38 @@ flowchart TB
 | --- | --- |
 | 上から下へだけ import する（shared は features を知らない） | 見た目の部品が、業務の言葉（予約・会計）を持たない。どこでも使い回せる |
 | features どうしは、直接 import しない。要るなら shared に下ろすか、app で組み合わせる | 予約の変更が、会計の画面を壊さない。消すときはフォルダごと消せる |
-| 1つの機能の物（部品・fragment・mutation・テスト）は、1つのフォルダに置く | 画面が要る項目を、部品の隣で決められる（fragment colocation）。探す場所が1つ |
-| データを取る部品と、props だけで描く部品を分ける | 描く部品は Storybook に載り、VRT とテストの対象になる |
+| 1つの機能の物（部品・fragment・mutation）は、1つのフォルダに置く。テストは `test/` に、同じ並びで置く | 画面が要る項目を、部品の近くで決められる（fragment colocation）。探す場所が1つ。テストは、本番のコードと混ざらず、まとめて見られる |
+| データを取る部品と、props だけで描く部品を分ける。fragment を読む部品は、`useFragment` で読むだけの薄い部品と、読んだ値を props で受け取って描く `〜View` に分ける | 描く部品は Storybook に載り、VRT とテストの対象になる（Apollo Client がなくても描ける） |
 | 決まりは、最初は文で書くだけ。破れるのを見てから、ESLint で止める（段階4） | なぜリンターで止めるのかを体験する |
+
+### フォルダの形（3つのアプリで同じ。2026-11-23 から。[D-020](decisions.md)）
+
+```
+apps/<app>/
+  app/                          ← URL と画面の対応だけ
+  features/<機能>/
+    graphql/<名前>.graphql       ← クエリ・mutation・fragment（GraphQL のまま書く）
+    graphql/<名前>.generated.ts  ← pnpm codegen が作る（操作の型と、型付きのドキュメント。手で直さない）
+    components/                 ← 部品（.tsx）
+    <計算・変換>.ts              ← 画面を持たない処理
+  lib/                          ← アプリ全体の設定（ログインの確認。そのクエリは lib/graphql/）
+  types/__generated__/graphql.ts ← pnpm codegen が作る（enum と入力の型）
+  types/apollo-client.d.ts      ← data masking の型を、codegen の型に合わせる
+  test/                         ← テスト（features・lib と同じ並び）
+```
+
+- 型は GraphQL Code Generator の `near-operation-file-preset`＋`typescript-operations`＋`typed-document-node` で作る（Apollo Client のドキュメントがすすめる形）。enum は文字列の合併型、日時の scalar は `string`
+- テストのファイルは、先頭にデータ（偽の応答・作る関数・モック・定数）、その下に `describe("正常系")`（期待どおりに進む流れ）と `describe("異常系")`（断られる・失敗する・境界・二重送信・ログイン切れ）
+
+### fragment の中身の隠し方（Apollo Client の data masking）
+
+`dataMasking: true`（`packages/web-kit/src/apollo.ts`）。クエリの結果からは、子の部品の fragment の中身が見えない。
+
+| 場面 | 書き方 | 例 |
+| --- | --- | --- |
+| 子の部品が、自分の fragment を読む | 親は、受け取った値をそのまま渡す（型は `FragmentType<〜Fragment>`）。子が `useFragment({ fragment: 〜FragmentDoc, from })` で読み、`〜View` に渡す | 患者の `AppointmentCard`・事務の `AppointmentTable` の行・医師の `ScheduleItem` |
+| 取った画面が、自分で fragment を読む（fragment は、mutation と同じ形を受け取るために分けている） | クエリの側で `...〜 @unmask` | 患者の `QuestionnairePage`・事務の `BillPage` |
+| 子の部品の fragment の項目を、別の画面でも使いたい | 子の fragment を読まずに、その画面のクエリで項目を直接選ぶ | 医師の `AppointmentDetail`（患者の名前・時刻） |
 
 ### 描く場所の分け方（App Router）
 

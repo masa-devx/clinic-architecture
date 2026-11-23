@@ -1,7 +1,8 @@
 node_modules
 .next
 # 自動で作るファイル（pnpm codegen）
-apps/*/lib/gql
+apps/*/types/__generated__
+apps/*/**/*.generated.ts
 pnpm-lock.yaml
 playwright-report
 test-results

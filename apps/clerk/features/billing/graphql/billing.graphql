@@ -1,0 +1,106 @@
+# 会計の画面に要る項目。どの操作のあとも、同じ形で受け取って、画面を新しくする
+fragment BillDetail on Bill {
+  id
+  status
+  totalAmount
+  canManage
+  billedAt
+  paidAt
+  refundedAt
+  items {
+    id
+    name
+    unitPrice
+    quantity
+    amount
+  }
+  appointment {
+    id
+    patient {
+      id
+      name
+    }
+    slot {
+      id
+      startsAt
+      doctor {
+        id
+        name
+      }
+      clinic {
+        id
+        name
+      }
+    }
+  }
+}
+
+# 会計と、（事務スタッフなら）料金の表を、1回の通信で取る。
+# この fragment を読むのは、取った画面（BillPage）自身なので、@unmask で中身を見せる
+query Bill($id: ID!) {
+  bill(id: $id) {
+    id
+    ...BillDetail @unmask
+  }
+  feeItems {
+    id
+    name
+    unitPrice
+  }
+}
+
+mutation UpdateBillItems($billId: ID!, $items: [BillItemInput!]!) {
+  updateBillItems(billId: $billId, items: $items) {
+    bill {
+      id
+      ...BillDetail
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+mutation ConfirmBill($billId: ID!) {
+  confirmBill(billId: $billId) {
+    bill {
+      id
+      ...BillDetail
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+mutation MarkBillPaid($billId: ID!) {
+  markBillPaid(billId: $billId) {
+    bill {
+      id
+      ...BillDetail
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+mutation RefundBill($billId: ID!) {
+  refundBill(billId: $billId) {
+    bill {
+      id
+      ...BillDetail
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}

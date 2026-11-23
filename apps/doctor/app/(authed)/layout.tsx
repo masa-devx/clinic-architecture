@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Shell } from "@/features/auth/Shell";
+import { Shell } from "@/features/auth/components/Shell";
 import { requireViewer } from "@/lib/viewer";
 import { ViewerProvider } from "@/lib/viewer-context";
 

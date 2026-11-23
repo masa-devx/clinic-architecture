@@ -1,0 +1,48 @@
+# 自分の空いている枠
+query OwnSlots($doctorId: ID, $after: String) {
+  availableSlots(doctorId: $doctorId, first: 30, after: $after) {
+    edges {
+      node {
+        id
+        startsAt
+        endsAt
+        canClose
+        doctor {
+          id
+          name
+        }
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+mutation CloseSlot($slotId: ID!) {
+  closeSlot(slotId: $slotId) {
+    slot {
+      id
+      closedAt
+      canClose
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+mutation CreateSlots($input: CreateSlotsInput!) {
+  createSlots(input: $input) {
+    createdCount
+    skippedCount
+    errors {
+      code
+      message
+      field
+    }
+  }
+}

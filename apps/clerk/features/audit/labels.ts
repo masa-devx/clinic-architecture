@@ -1,4 +1,4 @@
-import type { AuditAction, ViewerKind } from "@/lib/gql/graphql";
+import type { AuditAction, ViewerKind } from "@/types/__generated__/graphql";
 
 // 監査ログの操作の、画面での呼び方。操作の一覧そのものは、サーバーのスキーマ（AuditAction）が正。
 // 操作が増えると、ここに足すまで型のエラーになる

@@ -1,0 +1,73 @@
+# 予約のカード1枚に要る項目。カードを描く部品（AppointmentCard）の隣に置き、一覧のクエリはこれを広げて使う
+fragment AppointmentCardFields on Appointment {
+  id
+  status
+  canCancel
+  canCheckIn
+  canAnswerQuestionnaire
+  questionnaire {
+    id
+    submitted
+  }
+  bill {
+    id
+    status
+    totalAmount
+  }
+  slot {
+    id
+    startsAt
+    endsAt
+    doctor {
+      id
+      name
+    }
+    clinic {
+      id
+      name
+    }
+  }
+}
+
+query Appointments($filter: AppointmentFilter, $descending: Boolean, $after: String) {
+  appointments(filter: $filter, descending: $descending, first: 10, after: $after) {
+    edges {
+      node {
+        id
+        ...AppointmentCardFields
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+mutation CancelAppointment($appointmentId: ID!) {
+  cancelAppointment(appointmentId: $appointmentId) {
+    appointment {
+      id
+      ...AppointmentCardFields
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+mutation CheckIn($appointmentId: ID!) {
+  checkIn(appointmentId: $appointmentId) {
+    appointment {
+      id
+      ...AppointmentCardFields
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}

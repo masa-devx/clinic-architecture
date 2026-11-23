@@ -1,4 +1,4 @@
-import type { AppointmentFilter } from "@/lib/gql/graphql";
+import type { AppointmentFilter } from "@/types/__generated__/graphql";
 import { isDateString } from "@clinic/web-kit/datetime";
 import { isStatus } from "./status";
 

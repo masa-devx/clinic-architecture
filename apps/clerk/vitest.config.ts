@@ -10,7 +10,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["@clinic/web-kit/test/setup"],
-    include: ["{app,features,lib}/**/*.test.{ts,tsx}"],
+    // テストは test/ にまとめる（features・lib と同じ並び）
+    include: ["test/**/*.test.{ts,tsx}"],
     // どこで走らせても、日付の計算が同じ結果になるようにする（CI は UTC、手元は日本時間）
     env: { TZ: "UTC" },
     server: { deps: { inline: ["@clinic/web-kit", "@clinic/ui"] } },

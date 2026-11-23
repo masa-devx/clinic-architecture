@@ -1,0 +1,95 @@
+# 診察の予定の1件に要る項目。どの操作のあとも、同じ形で受け取って、画面を新しくする
+fragment ScheduleItemFields on Appointment {
+  id
+  status
+  canStartConsultation
+  canFinishConsultation
+  canViewQuestionnaire
+  questionnaire {
+    id
+    submitted
+  }
+  patient {
+    id
+    name
+  }
+  slot {
+    id
+    startsAt
+    endsAt
+  }
+}
+
+# 医師に見えるのは、自分が担当の予約だけ（絞るのはサーバー）
+query Schedule($filter: AppointmentFilter, $after: String) {
+  appointments(filter: $filter, first: 50, after: $after) {
+    edges {
+      node {
+        id
+        # キャンセルした予約を、予定から外すのに使う
+        status
+        ...ScheduleItemFields
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+mutation StartConsultation($appointmentId: ID!) {
+  startConsultation(appointmentId: $appointmentId) {
+    appointment {
+      id
+      ...ScheduleItemFields
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+mutation FinishConsultation($appointmentId: ID!) {
+  finishConsultation(appointmentId: $appointmentId) {
+    appointment {
+      id
+      ...ScheduleItemFields
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
+
+# 1件の予約と、問診の答え（答えを読むと、監査ログに「問診を見た」が残る）。
+# この画面が描く項目（患者の名前・時刻）は、ここで直接選ぶ。予定の1件の fragment（ScheduleItemFields）は、
+# それを描く部品（ScheduleItem）のもので、data masking で、ほかの部品からは読めない
+query AppointmentDetail($id: ID!) {
+  appointment(id: $id) {
+    id
+    patient {
+      id
+      name
+    }
+    slot {
+      id
+      startsAt
+    }
+    questionnaire {
+      id
+      submitted
+      submittedAt
+      answers {
+        questionId
+        label
+        text
+        selected
+      }
+    }
+  }
+}

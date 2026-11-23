@@ -25,7 +25,8 @@ export function createAppConfig(appUrl, nextConfigs) {
   ];
 
   return [
-    { ignores: [".next/**", "next-env.d.ts", "lib/gql/**"] },
+    // 自動で作るファイル（pnpm codegen）は、見ない
+    { ignores: [".next/**", "next-env.d.ts", "types/__generated__/**", "**/*.generated.ts"] },
     ...nextConfigs,
     { rules: { "import/no-restricted-paths": ["error", { zones: layerZones }] } },
   ];

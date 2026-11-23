@@ -19,7 +19,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | --- | --- | --- | --- |
 | バックエンド | Ruby・Ruby on Rails（API モード）・graphql-ruby | Ruby 4.0.9・Rails 8.1.4.1・graphql 2.6 | 手本にする構成と同じ。一から組んで理解する |
 | DB | PostgreSQL | 18.7 | 実行計画・ロックの道具がそろっている |
-| フロントエンド | TypeScript・Next.js（App Router）・Chakra UI・Apollo Client・GraphQL Code Generator | TypeScript 6.0（typescript-eslint が 7 にまだ対応していないため）・Next.js 16.4・React 19.3・Chakra UI 3.38・Apollo Client 4.3・codegen 8（client-preset 7） | 手本と同じ道具の、今の形 |
+| フロントエンド | TypeScript・Next.js（App Router）・Chakra UI・Apollo Client・GraphQL Code Generator | TypeScript 6.0（typescript-eslint が 7 にまだ対応していないため）・Next.js 16.4・React 19.3・Chakra UI 3.38・Apollo Client 4.3（data masking）・codegen 8（typescript-operations 7・near-operation-file-preset 6・typed-document-node 8。2026-11-23 に client-preset から替えた。[D-020](docs/decisions.md)） | 手本と同じ道具の、今の形 |
 | パッケージ管理 | pnpm（workspace） | Node 26.13.1・pnpm 12.21.0 | 1つのリポジトリで、スキーマと画面を一緒に変える |
 | テスト | RSpec＋FactoryBot＋Bullet／Vitest＋Testing Library＋MSW・Playwright | rspec-rails 8.1・Vitest 5.1・MSW 3.0・Playwright 1.65 | [docs/frontend.md](docs/frontend.md) のテストの層 |
 | 静的検査・整形 | RuboCop／ESLint・Prettier | rubocop-rails-omakase／ESLint 9.39（eslint-config-next の中のプラグインが 10 にまだ対応していないため）・Prettier 3.10 | — |
@@ -42,7 +42,12 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | apps/api/app/mailers/・app/views/ | 患者へのメール |
 | apps/api/lib/ | どの機能にも属さない基盤（エラーのコード・結果の型・ログ・カーソルのページング） |
 | apps/api/schema/ | Rails が書き出した、3つの入口のスキーマ（`patient.graphql`・`clerk.graphql`・`doctor.graphql`）。画面の型は、ここから作る |
-| apps/patient/・apps/clerk/・apps/doctor/ | 画面（Next.js）。患者用・事務スタッフ用・医師用の3つ。どれも `app/`（URL と画面・ログインの確認）→ `features/<機能>/`（部品・fragment・mutation・テスト）→ `lib/`（ログインしている人・生成した型 `lib/gql/`）。向きは ESLint で止めている（`eslint.app.mjs`） |
+| apps/patient/・apps/clerk/・apps/doctor/ | 画面（Next.js）。患者用・事務スタッフ用・医師用の3つ。どれも下の同じ形。向き（`app` → `features` → `lib`・`packages`、features どうしは import しない）は ESLint で止めている（`eslint.app.mjs`） |
+| apps/\*/app/ | URL と画面の対応・レイアウト・ログインの確認だけ。中身は features の部品を置く |
+| apps/\*/features/<機能>/ | 1つの機能の物。`graphql/<名前>.graphql`（クエリ・mutation・fragment）と、その隣に自動で作る `<名前>.generated.ts`（操作の型と型付きのドキュメント）・`components/`（部品。データを取る部品と、props だけで描く `〜View` を分ける）・直下の `.ts`（画面を持たない計算・変換） |
+| apps/\*/lib/ | アプリ全体の設定（ログインしている人の確認。そのクエリは `lib/graphql/`） |
+| apps/\*/types/ | `__generated__/graphql.ts`（自動で作る enum と入力の型）・`apollo-client.d.ts`（data masking の型を codegen に合わせる） |
+| apps/\*/test/・packages/web-kit/test/ | テスト（Vitest）。中の並びは、`features/`・`lib/`（packages は `src/`）と同じ。どのファイルも、先頭にデータ（偽の応答・作る関数・モック）、その下に `describe("正常系")` と `describe("異常系")` |
 | packages/ui/ | 見た目の部品とテーマ（Chakra UI）。画面の枠・状態の印・確認の窓つきボタンなど。業務の言葉を持たない |
 | packages/web-kit/ | 3つの画面で共有する土台。Apollo の設定・ログインのフォーム・画面の枠と Next.js のつなぎ・日付・状態の呼び方。`staff/` は、事務スタッフと医師で共通の部品（診療枠を作るフォーム・空き枠の一覧） |
 | e2e/ | Playwright の E2E。3つの画面をまたいで、初期データ（`apps/api/db/seeds.rb`）に対して走らせる |
@@ -66,7 +71,7 @@ AI（Claude Code・Codex）が最初に読む地図。`CLAUDE.md` はこのフ�
 | テスト（バックエンド） | `docker compose run --rm api bundle exec rspec` | DB が起動している | — |
 | テスト（フロントエンド） | `pnpm test`（Vitest）／`pnpm e2e`（Playwright。API と DB を起動し、初期データを入れ直してから走る。初回は `pnpm --filter e2e exec playwright install chromium`） | Docker | — |
 | 静的検査 | `docker compose run --rm api bin/rubocop`／`pnpm lint`・`pnpm typecheck`・`pnpm format:check` | — | `next lint`（Next.js 16 でなくなった） |
-| スキーマから型を作る | `docker compose run --rm api bin/rails graphql:dump` → `pnpm codegen` | スキーマ（型・resolver・mutation）を変えたとき | 型を手で書く |
+| スキーマから型を作る | `docker compose run --rm api bin/rails graphql:dump` → `pnpm codegen`（画面の `.graphql` だけを変えたときは `pnpm codegen` だけ） | スキーマ（型・resolver・mutation）か、画面の `.graphql` を変えたとき | 型を手で書く・`.generated.ts` を手で直す |
 | マイグレーション | `docker compose run --rm api bin/rails db:migrate` | — | — |
 | 初期データを入れ直す | `docker compose run --rm api bin/rails db:seed`（何度流しても同じ結果） | — | — |
 | 計測用の大量のデータ（課題 E-1） | `docker compose exec api bin/rails bulk:load`（予約100万件・1分半ほど。`APPOINTMENTS=10000` で小さく）／`bin/rails bulk:clear` で消す。初期データとは別の「計測用クリニック」に入る | — | — |

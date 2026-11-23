@@ -39,6 +39,9 @@ export function makeApolloClient(handlers: Handlers, paginated: PaginatedFields,
     Object.entries(paginated).map(([field, keyArgs]) => [field, relayStylePagination([...keyArgs])]),
   );
   return new ApolloClient({
+    // fragment の中身は、その fragment を持つ部品だけが useFragment で読む（親の部品には見えない）。
+    // 画面自身が読む fragment は、クエリの側で @unmask を付ける。型は、各アプリの types/apollo-client.d.ts で合わせる
+    dataMasking: true,
     // ブラウザは、画面と同じオリジンの /graphql に送る。Next.js が、そのアプリの入口（/graphql/patient など）へ中継する
     link: ApolloLink.from([errorLink(handlers), new HttpLink({ uri, credentials: "same-origin" })]),
     cache: new InMemoryCache({ typePolicies: { Query: { fields } } }),

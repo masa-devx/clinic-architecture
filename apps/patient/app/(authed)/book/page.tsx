@@ -1,5 +1,5 @@
 import { PageHeader } from "@clinic/ui/page-header";
-import { ClinicList } from "@/features/booking/ClinicList";
+import { ClinicList } from "@/features/booking/components/ClinicList";
 
 export default function BookPage() {
   return (

@@ -1,5 +1,5 @@
 import { PageHeader } from "@clinic/ui/page-header";
-import { OwnSlots } from "@/features/slots/OwnSlots";
+import { OwnSlots } from "@/features/slots/components/OwnSlots";
 
 export default function Page() {
   return (

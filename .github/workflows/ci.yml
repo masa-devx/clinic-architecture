@@ -64,7 +64,12 @@ jobs:
       - name: 依存を入れる
         run: pnpm install --frozen-lockfile
       - name: スキーマから作った型が、コミットしてあるものと同じか
-        run: pnpm codegen && git diff --exit-code -- apps/patient/lib/gql apps/clerk/lib/gql apps/doctor/lib/gql
+        # 作るのは、types/__generated__/graphql.ts（enum と入力の型）と、.graphql の隣の <名前>.generated.ts。
+        # まだコミットしていない生成物（新しい .graphql の隣）も見つけるため、追跡していないファイルも確かめる
+        run: |
+          pnpm codegen
+          git add --intent-to-add -- 'apps/*/types/__generated__' 'apps/*/**/*.generated.ts'
+          git diff --exit-code -- 'apps/*/types/__generated__' 'apps/*/**/*.generated.ts'
       - name: 整形
         run: pnpm format:check
       - name: ESLint

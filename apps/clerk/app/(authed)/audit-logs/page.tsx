@@ -1,5 +1,5 @@
 import { PageHeader } from "@clinic/ui/page-header";
-import { AuditLogList } from "@/features/audit/AuditLogList";
+import { AuditLogList } from "@/features/audit/components/AuditLogList";
 
 export default function AuditLogsPage() {
   return (

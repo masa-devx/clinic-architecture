@@ -1,5 +1,5 @@
 import { PageHeader } from "@clinic/ui/page-header";
-import { AppointmentsPage } from "@/features/appointments/AppointmentsPage";
+import { AppointmentsPage } from "@/features/appointments/components/AppointmentsPage";
 
 export default function Page() {
   return (

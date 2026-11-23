@@ -1,0 +1,54 @@
+# 予約の一覧の1行に要る項目
+fragment AppointmentRowFields on Appointment {
+  id
+  status
+  canCancel
+  bookedByStaff
+  patient {
+    id
+    name
+  }
+  bill {
+    id
+    status
+    totalAmount
+  }
+  slot {
+    id
+    startsAt
+    endsAt
+    doctor {
+      id
+      name
+    }
+  }
+}
+
+query Appointments($filter: AppointmentFilter, $after: String) {
+  appointments(filter: $filter, first: 20, after: $after) {
+    edges {
+      node {
+        id
+        ...AppointmentRowFields
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+mutation CancelAppointment($appointmentId: ID!) {
+  cancelAppointment(appointmentId: $appointmentId) {
+    appointment {
+      id
+      ...AppointmentRowFields
+    }
+    errors {
+      code
+      message
+      field
+    }
+  }
+}
