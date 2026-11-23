@@ -15,6 +15,7 @@ description: エンジニア出身の PdM（プロダクトマネージャー）
 
 - [docs/clients.md](../../../docs/clients.md)（クライアント・ビジネスサイド・目標と数字・届いている要望）
 - [docs/meetings/](../../../docs/meetings/README.md)（これまでの打ち合わせの記録）
+- [docs/growth.md](../../../docs/growth.md)（今の段階と、伸ばしたい観点）。要望は、今の段階に合うものを優先して選ぶ
 - Issue：`gh issue list`。進行中のプロジェクトがあれば、先にそれを終わらせる。**同時に進めるのは1つまで**
 
 ## 2. 要望を受け取り、掘る

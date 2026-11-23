@@ -8,6 +8,9 @@ secrets/
 # Claude Code の手元だけの設定（許可した操作の記録など）
 .claude/settings.local.json
 
+# 手元だけのメモ（実務の経験の深掘りなど、公開しないもの）
+private/
+
 # 言語・フレームワークの生成物
 node_modules/
 dist/
