@@ -10,7 +10,8 @@
 | [improvements/](improvements/README.md) | 課題と改善の記録（1件1ファイル・前と後の数字） |
 | [practice.md](practice.md) | 今ある土台（template ブランチ）の中身と、そこから切って進める実践の課題の一覧 |
 | [steps/](steps/README.md) | 段階ごとの解説と、6つの問いへの自分の答え・実装の記録 |
-| [company.md](company.md) | 練習の舞台にする架空の会社（事業・数字・関係者・最初の依頼）。すべて推測の値 |
+| [clients.md](clients.md) | クライアント（患者・医師・医療機関）とビジネスサイド・目標と数字・届いている要望。すべて推測で作ったもの |
+| [meetings/](meetings/README.md) | 打ち合わせの記録（PdM × ビジネスサイドで作る・作らない、PdM × プロジェクトリーダーで仕様を詰める） |
 | [stories/](stories/README.md) | 終えた課題を、面接で語る形にした記録（課題・比べた案・理由・結果・学び・想定問答） |
 
 ## 書き方
