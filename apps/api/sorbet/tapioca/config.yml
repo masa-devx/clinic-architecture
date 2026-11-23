@@ -6,6 +6,8 @@ gem:
   # doc: true
   # workers: 5
 dsl:
+  # Rails の RBI は、テストの環境で作る（CI はテストの DB しか作らない）。開発の環境だけのルート（rails_info など）は、型に入れない
+  environment: test
   # Add your `dsl` command parameters here:
   #
   # exclude:

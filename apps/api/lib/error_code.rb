@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 
 # エラーのコードの一覧（ここだけで決める）。GraphQL の enum と、画面の出し分けは、ここから作る
 module ErrorCode

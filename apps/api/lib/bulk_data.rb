@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 
 # 実行計画を読むための、大量のデータ（課題 E-1）。手元の開発の DB にだけ入れる。
 #
@@ -8,6 +8,8 @@
 #   そのため、モデルの検証・コールバック（通知の outbox・監査ログ）は通らない。DB の制約（CHECK・外部キー・排他制約）は通る
 # - 乱数の種を決めているので、同じ引数なら、同じ分布になる
 class BulkData
+  extend T::Sig
+
   CLINIC_NAME_PREFIX = "計測用クリニック"
   EMAIL_DOMAIN = "bulk.example"
   # 1枠は30分。9:00〜17:00 に16枠
@@ -22,7 +24,8 @@ class BulkData
   PASSWORD = "password-for-local-only"
 
   # 件数は、環境変数で変えられる（bin/rails bulk:load APPOINTMENTS=10000 など）
-  def self.from_env(env = ENV)
+  sig { params(env: T::Hash[String, String]).returns(BulkData) }
+  def self.from_env(env = ENV.to_h)
     abort "計測用のデータは、開発の環境でだけ入れます" unless Rails.env.development?
 
     new(
@@ -34,6 +37,11 @@ class BulkData
     )
   end
 
+  sig do
+    params(
+      appointments: Integer, patients: Integer, clinics: Integer, doctors_per_clinic: Integer, doctors_in_big_clinic: Integer, seed: Float
+    ).void
+  end
   def initialize(appointments:, patients:, clinics:, doctors_per_clinic:, doctors_in_big_clinic:, seed: 0.42)
     @appointments = appointments
     @patients = patients
@@ -45,6 +53,7 @@ class BulkData
   end
 
   # vacuum: false は、テスト用（テストは1つのトランザクションの中で走り、その中では VACUUM を流せない）
+  sig { params(vacuum: T::Boolean).returns(T::Hash[String, Integer]) }
   def load(vacuum: true)
     clear
     ActiveRecord::Base.transaction do
@@ -66,6 +75,7 @@ class BulkData
   end
 
   # 前に入れた計測用のデータを消す。画面から操作して増えた行（セッション・監査ログ・問診・通知）も一緒に消す
+  sig { void }
   def clear
     clinic_ids = "SELECT id FROM clinics WHERE name LIKE #{quote("#{CLINIC_NAME_PREFIX}%")}"
     patient_ids = "SELECT id FROM patients WHERE email LIKE #{quote("%@#{EMAIL_DOMAIN}")}"
@@ -90,6 +100,7 @@ class BulkData
     end
   end
 
+  sig { returns(T::Hash[String, Integer]) }
   def counts
     clinic_ids = "SELECT id FROM clinics WHERE name LIKE #{quote("#{CLINIC_NAME_PREFIX}%")}"
     {

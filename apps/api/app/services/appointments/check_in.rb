@@ -1,14 +1,18 @@
-# typed: false
+# typed: true
 
 # 受付（チェックイン）。患者が、予約の時刻の前に「準備できた」と伝える
 module Appointments
   class CheckIn
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), appointment_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, appointment_id:, now:)
       @actor = actor
       @appointment_id = appointment_id
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       appointment = AppointmentPolicy.scope(@actor).includes(:slot).find_by(id: @appointment_id)
       return Result.error("NOT_FOUND", "予約が見つかりません", field: "appointmentId") unless appointment

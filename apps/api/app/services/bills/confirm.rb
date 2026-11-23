@@ -1,14 +1,18 @@
-# typed: false
+# typed: true
 
 # 会計を確定する（作成中 → 請求済）。合計を、このときの明細から決める。確定したあとは変えられない
 module Bills
   class Confirm
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), bill_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, bill_id:, now:)
       @actor = actor
       @bill_id = bill_id
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       Bill.transaction do
         # 明細を入れ直す処理と待ち合うように、会計の行をロックする

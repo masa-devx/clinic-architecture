@@ -1,14 +1,15 @@
-# typed: false
+# typed: true
 
 # 利用者の種類。API の入口（GraphQL のスキーマ）と、画面のアプリは、この3つに分かれている
 #   patient: 患者 ／ clerk: 事務スタッフ ／ doctor: 医師
 module Audience
+  extend T::Sig
+
   ALL = %w[patient clerk doctor].freeze
 
-  module_function
-
   # その人が、どの入口の利用者か
-  def of(user)
+  sig { params(user: T.nilable(T.any(Patient, StaffMember))).returns(T.nilable(String)) }
+  def self.of(user)
     case user
     when Patient then "patient"
     when StaffMember then user.role
@@ -16,7 +17,8 @@ module Audience
   end
 
   # その入口でログインできる人（メールアドレスとパスワードを、この中から探す）
-  def accounts(audience)
+  sig { params(audience: String).returns(ActiveRecord::Relation) }
+  def self.accounts(audience)
     case audience
     when "patient" then Patient.all
     when "clerk" then StaffMember.clerk

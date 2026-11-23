@@ -1,19 +1,23 @@
-# typed: false
+# typed: true
 
 # ダッシュボードの集計。日ごと・医師ごとの、予約の件数・キャンセル・無断キャンセル・診察済・売上。
 # 開くたびに、その場で集計する（集計の表は、まだ作っていない。遅くなったら、測ってから足す）
 module Dashboards
   class DailyQuery
+    extend T::Sig
+
     MAX_DAYS = 31
 
     Row = Data.define(:date, :doctor_id, :total, :canceled, :no_show, :completed, :revenue)
 
+    sig { params(clinic_id: Integer, from: Date, to: Date).void }
     def initialize(clinic_id:, from:, to:)
       @clinic_id = clinic_id
       @from = from
       @to = to
     end
 
+    sig { returns(T::Array[Row]) }
     def rows
       # 日の区切りは、日本時間。DB の中の時刻は UTC なので、日本時間に直してから日付にする
       day = "(slots.starts_at AT TIME ZONE '#{Time.zone.tzinfo.name}')::date"

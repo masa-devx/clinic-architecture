@@ -1,14 +1,17 @@
-# typed: false
+# typed: true
 
 # 会計を、支払い済にする（請求済 → 支払い済）・返金する（支払い済 → 返金済。全額）
 # 決済サービスにはつながない。窓口で受け取った・返したことを、事務スタッフが記録するだけ
 module Bills
   class Settle
+    extend T::Sig
+
     STEPS = {
       pay: { from: "billed", to: "paid", at: :paid_at, action: "bill.pay", message: "支払い済にできるのは、請求済の会計だけです" },
       refund: { from: "paid", to: "refunded", at: :refunded_at, action: "bill.refund", message: "返金できるのは、支払い済の会計だけです" }
     }.freeze
 
+    sig { params(actor: T.any(Patient, StaffMember), bill_id: T.any(Integer, String), step: Symbol, now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, bill_id:, step:, now:)
       @actor = actor
       @bill_id = bill_id
@@ -16,6 +19,7 @@ module Bills
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       bill = BillPolicy.scope(@actor).find_by(id: @bill_id)
       return Result.error("NOT_FOUND", "会計が見つかりません", field: "billId") unless bill && BillPolicy.new(@actor, bill).manage?

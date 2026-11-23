@@ -1,14 +1,18 @@
-# typed: false
+# typed: true
 
 # 診察を始める。担当の医師が、受付済の予約に対してだけできる
 module Appointments
   class StartConsultation
+    extend T::Sig
+
+    sig { params(actor: T.any(Patient, StaffMember), appointment_id: T.any(Integer, String), now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, appointment_id:, now:)
       @actor = actor
       @appointment_id = appointment_id
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       # 医師に見えるのは、自分が担当の予約だけ（AppointmentPolicy.scope）
       appointment = AppointmentPolicy.scope(@actor).find_by(id: @appointment_id)

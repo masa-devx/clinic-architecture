@@ -205,7 +205,9 @@ RSpec.describe "監査ログ" do
       end
 
       it "決めていない操作の名前は、入らない" do
-        expect { Audit.record(actor: patient, action: "unknown", clinic_id: clinic.id, patient_id: patient.id, subject: log, now: now) }
+        # subject は、Audit.record が受け取る記録（予約・会計・問診）にする。監査ログそのものは、sig で断られる
+        appointment = Appointment.find(log.subject_id)
+        expect { Audit.record(actor: patient, action: "unknown", clinic_id: clinic.id, patient_id: patient.id, subject: appointment, now: now) }
           .to raise_error(ActiveRecord::RecordInvalid)
       end
     end

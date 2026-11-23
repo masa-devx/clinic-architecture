@@ -1,15 +1,16 @@
-# typed: false
+# typed: true
 
 # 予約をキャンセルできるかの決まり。DB も時計も読まない（now は外から渡す）
 module Appointments
   module CancellationRule
+    extend T::Sig
+
     # 患者がキャンセルできるのは、開始のこの時間前まで。仮の値（要件 13章の M6）
     PATIENT_DEADLINE = 1.hour
 
-    module_function
-
     # キャンセルできるなら nil、できないなら UserError を返す
-    def violation(by_patient:, status:, starts_at:, now:)
+    sig { params(by_patient: T::Boolean, status: String, starts_at: ActiveSupport::TimeWithZone, now: ActiveSupport::TimeWithZone).returns(T.nilable(UserError)) }
+    def self.violation(by_patient:, status:, starts_at:, now:)
       # 受付済の予約をキャンセルできるのは、事務スタッフだけ（患者はもう来ているので、医療機関の側の都合のとき）
       return nil if status == "checked_in" && !by_patient
 

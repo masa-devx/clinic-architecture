@@ -1,8 +1,10 @@
-# typed: false
+# typed: true
 
 # 診療枠を、曜日・時間帯・1枠の長さ・期間から、まとめて作る
 module Slots
   class BulkCreate
+    extend T::Sig
+
     MAX_DAYS = 92
     MAX_SLOTS = 2000
     SLOT_MINUTES = (5..240)
@@ -10,6 +12,12 @@ module Slots
 
     Created = Data.define(:created_count, :skipped_count)
 
+    sig do
+      params(
+        actor: T.any(Patient, StaffMember), doctor_id: T.any(Integer, String), from: Date, to: Date, weekdays: T::Array[Integer], start_time: String, end_time: String,
+        slot_minutes: Integer, now: ActiveSupport::TimeWithZone
+      ).void
+    end
     def initialize(actor:, doctor_id:, from:, to:, weekdays:, start_time:, end_time:, slot_minutes:, now:)
       @actor = actor
       @doctor_id = doctor_id
@@ -22,6 +30,7 @@ module Slots
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       return Result.error("NOT_PERMITTED", "診療枠を作れるのは、医師と事務スタッフだけです") unless @actor.is_a?(StaffMember)
 

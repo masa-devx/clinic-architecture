@@ -1,12 +1,15 @@
-# typed: false
+# typed: true
 
 # 会計の下書きの明細を、入れ直す（料金の表から選んだ項目と数量）
 module Bills
   class UpdateItems
+    extend T::Sig
+
     MAX_ITEMS = 50
     QUANTITY = (1..99)
 
     # items は { fee_item_id:, quantity: } の並び
+    sig { params(actor: T.any(Patient, StaffMember), bill_id: T.any(Integer, String), items: T::Array[{ fee_item_id: T.any(Integer, String), quantity: Integer }], now: ActiveSupport::TimeWithZone).void }
     def initialize(actor:, bill_id:, items:, now:)
       @actor = actor
       @bill_id = bill_id
@@ -14,6 +17,7 @@ module Bills
       @now = now
     end
 
+    sig { returns(Result) }
     def call
       Bill.transaction do
         # 会計の行をロックする。確定の処理と同時に来ても、「確定したあとに明細が変わる」が起きない

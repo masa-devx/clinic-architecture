@@ -1,16 +1,20 @@
-# typed: false
+# typed: true
 
 # 開始から一定の時間たっても受付がない予約を、無断キャンセルにする（定期の処理から呼ぶ）
 module Appointments
   class MarkNoShows
+    extend T::Sig
+
     BATCH_SIZE = 500
 
+    sig { params(now: ActiveSupport::TimeWithZone, batch_size: Integer).void }
     def initialize(now:, batch_size: BATCH_SIZE)
       @now = now
       @batch_size = batch_size
     end
 
     # 無断キャンセルにした件数を返す
+    sig { returns(Integer) }
     def call
       cutoff = ConsultationRule.no_show_cutoff(@now)
       total = 0
